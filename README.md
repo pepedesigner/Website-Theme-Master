@@ -93,16 +93,56 @@ Run against the real project directory:
 node tools/shoot.mjs --target "/path/to/sandcode"
 ```
 
-Switching back to the SandBase theme restores the original design colour for colour:
+### Does it get SandCode right?
+
+SandCode ships its own palette, and this tool ships that palette as the **SandBase** theme. So applying SandBase to SandCode should be a no-op — which makes it a hard, measurable accuracy test:
+
+```bash
+node tools/diff-sandbase.mjs "/path/to/sandcode" sandbase light
+```
+
+It renders the site untouched, renders it again wearing SandBase, and compares every computed colour on every element:
 
 ```
-light   bg=#f2f0f3  ink=#0e0b1a  muted=#5d5969  term=#0e0b1a/#f2f0f3  card=#ffffff  mark=#d9ff43
-dark    bg=#0e0b1a  ink=#f2f0f3  muted=#a29ea9  term=#1e1936/#f2f0f3  card=#241d44  mark=#8b6fff
+light  2768 properties compared · 0 changed
+dark   2768 properties compared · 3 changed
 ```
 
-And the palette survives theme-switching without drifting — switch through a dozen themes and come back, and every value is identical.
+Light is exact. The three dark-mode differences are two quiet-band surfaces where the site's own design goes *darker* than its canvas and SandBase's dark palette has no darker surface to offer — a gap in the role vocabulary, not a mapping error.
 
-The four detail directions above, measured on the same site:
+Getting there meant fixing bugs that only show up when you measure. Ranked by how visible they were:
+
+- **The primary button inverted.** SandCode paints it with `--btn-bg: var(--ink)` / `--btn-fg: var(--bg)`. Treating `-bg` and `-fg` as page-level roles made the fill the canvas and the label the ink — a light button with dark text in a dark theme, where it should have been the reverse. Component-namespaced variables (`--btn-*`, `--card-*`) are now resolved from the colour they actually hold.
+- **The highlight text vanished.** `h1 em` pairs `--mark-bg` with `--mark-fg`. Both matched the `mark` in their name, so the text took the highlight colour and disappeared into its own background. `-fg` / `-bg` suffixes now resolve to the right side of the pair.
+- **The terminal's lime went near-black.** `--code-accent` matched a `code` prefix that assumed a surface; it is a syntax colour. Code namespaces now resolve to code roles.
+- **Translucent tokens lost their alpha**, turning the sticky header into an opaque slab.
+- **Sites with their own dark mode** had their `body[data-theme="dark"]` block rewritten with light values.
+
+### Is every theme readable?
+
+Not distorting the original is half of it; the other half is that *other* themes leave the page usable:
+
+```bash
+node tools/audit-themes.mjs
+```
+
+```
+34 themes × 2 modes — 952 checks on fixtures-sandcode
+every pair clears its threshold; code surfaces stay dark
+```
+
+14 pairs per theme per mode — body copy, lede, card copy, FAQ answers, both button styles, terminal text, code accents, the `<em>` highlight, the dark CTA band — checked against WCAG, plus an invariant that the terminal panel stays dark rather than turning into a pale card.
+
+Two repair rules came out of this, both about transparency:
+
+- A translucent colour is only kept translucent if it stays above AA **on the surface it is actually for** — a plate ink is judged against the plate, not the canvas it never sits on.
+- Body text can land on the canvas or on a dark band, and the mapping cannot tell which, so a text-role transparency has to clear both.
+
+Without those, twelve theme/mode combinations had their band text between 2.9:1 and 4.3:1 — most visibly Solarized, where the panel ink only reaches 4.7:1 when solid, so 28% of background bleeding through drops it to 2.9:1.
+
+### Detail controls
+
+Four directions, same site, same theme family — proof the non-colour controls do the heavy lifting. Measured on SandCode:
 
 | Direction | Radius | Font | Also | Measured |
 | --- | --- | --- | --- | --- |
@@ -147,6 +187,8 @@ Website Theme Master/
 │   ├── import-themes.mjs   Theme Studio themes → role model
 │   ├── smoke.mjs           end-to-end assertions
 │   ├── verify-details.mjs  numeric assertions for the detail controls
+│   ├── diff-sandbase.mjs   identity check: original vs its own theme, per property
+│   ├── audit-themes.mjs    legibility audit across the whole theme library
 │   └── shoot.mjs           preview renders (--target for any site)
 ├── docs/                   screenshots used here
 └── out/                    generated renders
@@ -158,6 +200,7 @@ Website Theme Master/
 npm start                          # launch the workbench
 npm run smoke                      # end-to-end assertions
 npm run verify                     # detail-control assertions
+npm run audit                      # legibility audit, all themes × both modes
 npm run shoot                      # render the full preview set
 npm run shoot -- --target <dir>    # render against any site
 npm run themes                     # re-import the theme library
@@ -165,7 +208,9 @@ npm run themes                     # re-import the theme library
 
 ## Verification
 
-`npm run smoke` does not check that the page opens. It asserts the product's actual claims:
+Three suites, each answering a different question.
+
+**Does it still work at all?**
 
 ```
 PASS  engine produces an override stylesheet
@@ -180,6 +225,10 @@ PASS  corner radius applies
 PASS  motion control applies
 11/11 checks passed
 ```
+
+**Does it get a known design right?** `diff-sandbase.mjs` compares every computed colour on a site before and after applying that site's own palette as a theme — 2768 properties, 0 differences in light mode.
+
+**Does every theme stay readable?** `audit-themes.mjs` renders the site under all 34 themes in both modes and checks 952 contrast pairs plus the invariant that code surfaces stay dark.
 
 ## Known limits
 

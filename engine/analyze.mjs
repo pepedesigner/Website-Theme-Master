@@ -9,7 +9,7 @@
  *
  * Step 1 gives us the palette to remap; step 2 gives us the hooks to apply it.
  */
-import { chroma, composite, contrast, parseColor, toHex, luminance } from './color.mjs'
+import { chroma, composite, contrast, parseColor, toCss, toHex, luminance } from './color.mjs'
 
 const COLOR_PROPS = [
   'color',
@@ -235,14 +235,16 @@ export function analyzeSite(doc = document, win = window) {
       if (seenVars.has(key)) continue
 
       const declared = rule.style.getPropertyValue(prop).trim()
-      let resolved = parseColor(declared) ? toHex(declared) : null
+      // toCss, not toHex: a translucent token has to keep its alpha, or a
+      // sticky header written as rgba(...,.86) is repainted as an opaque slab
+      let resolved = parseColor(declared) ? toCss(declared) : null
 
       // the value may be another var, or only meaningful on a specific element
       if (!resolved) {
         try {
           const target = doc.querySelector(stripePseudo(rule.selectorText)) ?? doc.documentElement
           const computed = target ? win.getComputedStyle(target).getPropertyValue(prop).trim() : ''
-          if (parseColor(computed)) resolved = toHex(computed)
+          if (parseColor(computed)) resolved = toCss(computed)
         } catch {
           /* an unqueryable selector simply stays unresolved */
         }

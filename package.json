@@ -9,7 +9,9 @@
     "themes": "node tools/import-themes.mjs",
     "shoot": "node tools/shoot.mjs",
     "smoke": "node tools/smoke.mjs",
-    "verify": "node tools/verify-details.mjs"
+    "verify": "node tools/verify-details.mjs",
+    "audit": "node tools/audit-themes.mjs",
+    "identity": "node tools/diff-sandbase.mjs fixtures-sandcode sandbase light"
   },
   "devDependencies": {
     "playwright-core": "^1.63.0"

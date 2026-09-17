@@ -11,6 +11,8 @@
  */
 import {
   chroma as chromaOf,
+  composite,
+  contrast,
   luminance,
   mix,
   parseColor,
@@ -49,42 +51,89 @@ const RAMP_ROLES = {
 }
 
 /**
- * A well-named custom property states its own role, and that beats any amount of
- * statistics. `--muted` is the muted text colour because it says so.
+ * Component-scoped prefixes.
+ *
+ * Real design systems are full of paired variables that belong to one component
+ * rather than to the page: `--btn-bg` / `--btn-fg`, `--mark-bg` / `--mark-fg`.
+ * Guessing a page-level role from the `-bg` in `--btn-bg` inverts the button;
+ * guessing one from the `mark` in `--mark-fg` paints highlight text in the
+ * highlight colour. When a name is namespaced like this, we resolve it from the
+ * colour we measured instead of from its name.
  */
-const ROLE_HINTS = [
-  // code surfaces first, because `--panel-fg` is a code colour while `--panel`
-  // is the surface it sits on — the compound names have to win before the
-  // generic `fg` and `panel` rules see them
-  [/(panel|code|terminal|console|snippet|editor|(^|[-_])pre)[-_]?(fg|text|foreground|ink|content)/i, 'plateFg'],
-  [/(syntax|code|token)[-_]?(keyword|bright|type|tag)/i, 'codeKeyword'],
-  [/(syntax|code|token)[-_]?(func|fn|function|method)/i, 'codeFunction'],
-  [/(syntax|code|token)[-_]?(num|number|literal|warn|constant)/i, 'codeNumber'],
-  [/(syntax|code|token)[-_]?(muted|comment|dim)/i, 'codeMuted'],
-  [/(panel|code|terminal|console|snippet|editor|(^|[-_])(pre|editor))/i, 'plate'],
+const COMPONENT_PREFIXES = new Set([
+  'btn', 'button', 'input', 'field', 'badge', 'chip', 'tag', 'pill',
+  'tooltip', 'popover', 'modal', 'dialog', 'toast', 'alert', 'banner',
+  'nav', 'navbar', 'menu', 'sidebar', 'header', 'footer', 'hero',
+  'table', 'tab', 'form', 'switch', 'toggle', 'slider', 'checkbox', 'radio',
+  'avatar', 'dropdown', 'accordion', 'breadcrumb', 'pagination', 'progress',
+  'skeleton', 'spinner', 'segment', 'tabbar', 'topbar', 'drawer', 'sheet',
+])
 
-  [/(^|[-_])(muted|dim|quiet|subtle|tertiary|text-secondary|secondary-text)/i, 'muted'],
-  [/(^|[-_])(accent|primary|brand|link|focus)/i, 'accent'],
-  [/(^|[-_])(highlight|mark|selection)/i, 'highlight'],
-  [/(^|[-_])(success|positive|ok|valid)/i, 'positive'],
-  [/(^|[-_])(warning|warn|caution)/i, 'warning'],
-  [/(^|[-_])(danger|error|destructive|invalid|critical|red)/i, 'danger'],
-  [/(^|[-_])strong/i, 'borderStrong'],
-  [/(border|divider|stroke|outline|rule|hairline|separator|(^|[-_])line)/i, 'border'],
-  [/(^|[-_])(ink|text|foreground|fg|content|on-surface)/i, 'text'],
-  [/(bg|background|surface|layer|neutral|gray|grey)[-_]?(3|alt|element|raised|elevated|muted)/i, 'surfaceAlt'],
-  [/(bg|background|surface|layer|neutral|gray|grey)[-_]?(2|secondary|subtle|sunken)/i, 'surface'],
-  [/(^|[-_])(card|popover|menu|dropdown|modal|dialog|overlay|elevation|sheet)/i, 'surface'],
-  [/(tint|wash|band|stripe|strip|well|inset)/i, 'surfaceAlt'],
-  [/(^|[-_])(bg|background|surface|canvas|page|layer|base)/i, 'canvas'],
-]
+const FG_WORDS = new Set(['fg', 'text', 'foreground', 'ink', 'content', 'contrast', 'label'])
 
-/** Which role a custom property's a name claims, if any. */
-function roleFromVariableName(name) {
-  const bare = name.replace(/^--/, '')
-  for (const [pattern, role] of ROLE_HINTS) {
-    if (pattern.test(bare)) return role
+/** Split a variable name into role-ish tokens: `--color-bg-2` → [color, bg, 2]. */
+function tokensOf(name) {
+  return name
+    .replace(/^--/, '')
+    .replace(/(\d+)/g, '-$1-')
+    .toLowerCase()
+    .split(/[-_.]+/)
+    .filter(Boolean)
+}
+
+/** Which role a custom property's name claims, if any. */
+export function roleFromVariableName(name) {
+  const tokens = tokensOf(name)
+  if (!tokens.length) return null
+
+  // a component namespace means the colour belongs to that component, and its
+  // second word (`bg`, `fg`) says nothing about its role on the page
+  if (tokens.length > 1 && COMPONENT_PREFIXES.has(tokens[0])) return null
+
+  const has = (...words) => words.some((word) => tokens.includes(word))
+  const isFg = tokens.some((word) => FG_WORDS.has(word)) || tokens.includes('on')
+
+  if (has('code', 'syntax', 'token', 'editor')) {
+    if (has('keyword', 'bright', 'type', 'tag', 'key')) return 'codeKeyword'
+    if (has('func', 'function', 'method', 'path', 'accent')) return 'codeFunction'
+    if (has('num', 'number', 'literal', 'warn', 'constant')) return 'codeNumber'
+    if (has('muted', 'dim', 'comment', 'quiet')) return 'codeMuted'
+    return 'codeFg'
   }
+
+  if (has('panel', 'terminal', 'console', 'snippet', 'editor', 'pre')) {
+    return isFg ? 'plateFg' : 'codeBg'
+  }
+
+  if (has('plate', 'band', 'banner')) {
+    return isFg ? 'plateFg' : 'plate'
+  }
+
+  if (has('mark', 'highlight', 'selection')) return isFg ? 'highlightFg' : 'highlight'
+
+  if (has('accent', 'primary', 'brand', 'link')) {
+    return isFg || has('strong') ? 'accentFg' : 'accent'
+  }
+
+  if (has('success', 'positive', 'valid')) return 'positive'
+  if (has('warning', 'warn', 'caution')) return 'warning'
+  if (has('danger', 'error', 'destructive', 'invalid', 'critical', 'red')) return 'danger'
+
+  if (has('muted', 'dim', 'quiet', 'subtle', 'tertiary')) return 'muted'
+  if (has('strong', 'bold')) return 'borderStrong'
+  if (has('border', 'divider', 'stroke', 'outline', 'hairline', 'separator', 'line', 'rule')) return 'border'
+  if (has('ink', 'text', 'foreground', 'fg', 'content')) return 'text'
+  if (has('surface', 'card', 'elevation', 'overlay', 'popover', 'menu', 'dropdown', 'modal', 'dialog')) return 'surface'
+  if (has('tint', 'wash', 'band', 'stripe', 'well', 'inset', 'shade')) return 'surfaceAlt'
+
+  // page-level backgrounds only when the name *leads* with one, so `--btn-bg`
+  // and `--chrome-bg` fall through to measurement instead of becoming the canvas
+  if (['bg', 'background', 'canvas', 'page', 'body'].includes(tokens[0])) {
+    if (has('3', 'alt', 'element', 'raised', 'elevated', 'tertiary', 'high')) return 'surfaceAlt'
+    if (has('2', 'secondary', 'subtle', 'sunken', 'low', 'muted')) return 'surface'
+    return 'canvas'
+  }
+
   return null
 }
 
@@ -102,8 +151,13 @@ function kindOfVariable(name) {
   if (role === 'canvas' || role === 'surface' || role === 'surfaceAlt' || role === 'plate') return 'background'
   if (role === 'border' || role === 'borderStrong') return 'border'
   if (role === 'text' || role === 'muted') return 'foreground'
-  if (/bg|background|surface|panel|card|canvas|plate|elevation|shade|fill/i.test(name)) return 'background'
-  if (/border|divider|stroke|outline|rule|line|hairline|separator/i.test(name)) return 'border'
+  const tokens = tokensOf(name)
+  if (tokens.some((t) => ['bg', 'background', 'surface', 'panel', 'card', 'canvas', 'plate', 'elevation', 'shade', 'fill'].includes(t))) {
+    return 'background'
+  }
+  if (tokens.some((t) => ['border', 'divider', 'stroke', 'outline', 'rule', 'line', 'hairline', 'separator'].includes(t))) {
+    return 'border'
+  }
   return 'foreground'
 }
 
@@ -128,12 +182,46 @@ export function buildMapping(site, roles, mode, options = {}) {
   const plateKeys = new Set((site.plates ?? []).map((entry) => toHex(entry.color)))
   const plateInkKeys = new Set((site.plateInk ?? []).map((entry) => toHex(entry.color)))
 
+  /**
+   * A faint neutral wash — a 5% hover tint, a 14% hairline — is structural, not
+   * brand. It only has to be re-pointed when the theme flips the page's
+   * polarity; a dark wash on a light page becoming a dark wash on a dark page
+   * is the one case where leaving it alone makes it disappear. Otherwise it
+   * stays exactly as the site wrote it.
+   */
+  const themeIsLight = luminance(roles[mode].canvas) > 0.5
+  const flipWash = canvasLum > 0.5 !== themeIsLight
+  const isWash = (color) => {
+    const parsed = parseColor(color)
+    return Boolean(parsed) && parsed.a > 0 && parsed.a < 0.25 && chromaOf(color) < 0.12
+  }
+
   const table = new Map()
   const ramps = {}
+  const inkKeys = new Set()
+  // which role each entry was paired with. Two roles regularly share a hex —
+  // Catppuccin Frappé's `text` and `plateFg` are both #c6d0f5 — so guessing the
+  // role back from the colour picks the wrong backdrop half the time.
+  const roleTable = new Map()
+
+  // Surfaces sit on one side of the canvas or the other: in SandCode's light
+  // theme `surface` is *lighter* than the canvas and `surfaceAlt` is *darker*,
+  // so ranking purely by distance cannot tell them apart. When the theme's two
+  // surfaces straddle the canvas, a site colour's side decides its role.
+  const surfaceSide = Math.sign(luminance(roles[mode].surface) - canvasLum)
+  const altSide = Math.sign(luminance(roles[mode].surfaceAlt) - canvasLum)
+  const straddles = surfaceSide !== 0 && altSide !== 0 && surfaceSide !== altSide
 
   for (const [kind, config] of Object.entries(RAMP_ROLES)) {
-    const stops = dedupe(config.roles.map((name) => roles[mode][name]))
-    const list = stops.length ? stops : [roles[mode].text]
+    // keep the role names alongside their colours so a pairing can report both
+    const stops = []
+    for (const roleName of config.roles) {
+      const value = roles[mode][roleName]
+      if (!parseColor(value)) continue
+      if (stops.length && toHex(stops[stops.length - 1].color) === toHex(value)) continue
+      stops.push({ role: roleName, color: value })
+    }
+    const list = stops.length ? stops : [{ role: 'text', color: roles[mode].text }]
 
     const source =
       kind === 'background' ? site.backgrounds : kind === 'border' ? site.borders : site.foregrounds
@@ -145,18 +233,34 @@ export function buildMapping(site, roles, mode, options = {}) {
         kind === 'background' ? toHex(entry.color) !== canvasKey : !plateInkKeys.has(toHex(entry.color)),
       )
 
+    const placed = new Set()
+    if (kind === 'background' && straddles) {
+      for (const entry of candidates) {
+        const side = Math.sign(luminance(entry.color) - canvasLum)
+        if (side !== surfaceSide && side !== altSide) continue
+        const roleName = side === surfaceSide ? 'surface' : 'surfaceAlt'
+        table.set(`${kind}:${toHex(entry.color)}`, keep(entry.color, roles[mode][roleName]))
+        roleTable.set(`${kind}:${toHex(entry.color)}`, roleName)
+        placed.add(toHex(entry.color))
+      }
+    }
+
     // a colour used twice on one page is noise, and letting it take the text
     // slot is how a single stray hex used to steal a whole role
     const heaviest = Math.max(...candidates.map((entry) => entry.weight), 0)
     const observed = candidates
+      .filter((entry) => !placed.has(toHex(entry.color)))
       .filter((entry) => entry.weight >= heaviest * 0.05)
       .map((entry) => ({ ...entry, distance: Math.abs(luminance(entry.color) - canvasLum) }))
       .sort((a, b) => (config.order === 'asc' ? a.distance - b.distance : b.distance - a.distance))
 
     observed.forEach((entry, index) => {
       const position = observed.length === 1 ? 0 : index / (observed.length - 1)
-      const target = list[Math.round(position * (list.length - 1))]
-      table.set(`${kind}:${toHex(entry.color)}`, keep(entry.color, target))
+      const stop = list[Math.round(position * (list.length - 1))]
+      table.set(`${kind}:${toHex(entry.color)}`, keep(entry.color, stop.color))
+      roleTable.set(`${kind}:${toHex(entry.color)}`, stop.role)
+      // remember which colour won the text role; the background pass needs it
+      if (kind === 'foreground' && stop.role === 'text') inkKeys.add(toHex(entry.color))
     })
 
     // a floor on the span keeps a very low-contrast site from being stretched
@@ -167,17 +271,30 @@ export function buildMapping(site, roles, mode, options = {}) {
     }
   }
 
+  // A site's ink is sometimes used as a fill as well as for text — SandCode
+  // paints its primary button with `--ink`. Left to the background ramp that
+  // fill lands on a surface and the button inverts, so the ink claims it back.
+  for (const key of inkKeys) {
+    if (key !== canvasKey) {
+      table.set(`background:${key}`, keep(key, roles[mode].text))
+      roleTable.set(`background:${key}`, 'text')
+    }
+  }
+
   // the canvas is the one colour that must never be guessed
   table.set(`background:${canvasKey}`, keep(site.canvas, roles[mode].canvas))
+  roleTable.set(`background:${canvasKey}`, 'canvas')
 
   // inverse panels keep their role: the plate colour on the background side
   // only, and its ink on the foreground side only
   for (const entry of site.plates ?? []) {
     table.set(`background:${toHex(entry.color)}`, keep(entry.color, roles[mode].plate))
+    roleTable.set(`background:${toHex(entry.color)}`, 'plate')
   }
   for (const entry of site.plateInk ?? []) {
     for (const kind of ['foreground', 'border']) {
       table.set(`${kind}:${toHex(entry.color)}`, keep(entry.color, roles[mode].plateFg))
+      roleTable.set(`${kind}:${toHex(entry.color)}`, 'plateFg')
     }
   }
 
@@ -194,6 +311,7 @@ export function buildMapping(site, roles, mode, options = {}) {
     // the loudest colour on the site becomes the theme's accent — that is the
     // whole point of picking a theme
     table.set(`chroma:${toHex(siteChroma[0].color)}`, keep(siteChroma[0].color, roles[mode].accent))
+    roleTable.set(`chroma:${toHex(siteChroma[0].color)}`, 'accent')
 
     const palette = dedupe(['highlight', 'positive', 'warning', 'danger'].map((role) => roles[mode][role]))
       .sort((a, b) => toHsl(a).h - toHsl(b).h)
@@ -205,7 +323,13 @@ export function buildMapping(site, roles, mode, options = {}) {
     ranked.forEach((entry, index) => {
       const position = ranked.length === 1 ? 0 : index / (ranked.length - 1)
       const target = palette[Math.round(position * (palette.length - 1))]
-      if (target) table.set(`chroma:${toHex(entry.color)}`, keep(entry.color, target))
+      if (target) {
+        table.set(`chroma:${toHex(entry.color)}`, keep(entry.color, target))
+        const named = ['highlight', 'positive', 'warning', 'danger'].find(
+          (role) => toHex(roles[mode][role]) === toHex(target),
+        )
+        if (named) roleTable.set(`chroma:${toHex(entry.color)}`, named)
+      }
     })
   }
 
@@ -229,17 +353,26 @@ export function buildMapping(site, roles, mode, options = {}) {
     return best ?? roles[mode].accent
   }
 
-  const resolve = (color, kind = 'foreground') => {
+  /** Resolve, and report which role the answer belongs to. */
+  const resolveDetailed = (color, kind = 'foreground') => {
+    if (isWash(color)) return { color: flipWash ? toHex(roles[mode].text) : toHex(color), role: 'text' }
     const key = toHex(color)
     if (chromaOf(color) >= 0.14) {
-      return keep(color, table.get(`chroma:${key}`) ?? chromaTarget(color))
+      const known = table.get(`chroma:${key}`)
+      return { color: keep(color, known ?? chromaTarget(color)), role: roleTable.get(`chroma:${key}`) ?? 'accent' }
     }
     const known = table.get(`${kind}:${key}`)
-    if (known !== undefined) return known
+    if (known !== undefined) return { color: known, role: roleTable.get(`${kind}:${key}`) ?? null }
+    // a colour equal to the page canvas is the canvas in every job it does —
+    // SandCode paints its primary button's label with it (`--btn-fg: var(--bg)`)
+    if (key === canvasKey) return { color: keep(color, roles[mode].canvas), role: 'canvas' }
     const { stops, span } = ramps[kind] ?? ramps.foreground
     const position = Math.min(1, Math.abs(luminance(color) - canvasLum) / span)
-    return keep(color, stops[Math.round(position * (stops.length - 1))])
+    const stop = stops[Math.round(position * (stops.length - 1))]
+    return { color: keep(color, stop.color), role: stop.role }
   }
+
+  const resolve = (color, kind = 'foreground') => resolveDetailed(color, kind).color
 
   /**
    * A custom property that names its own role gets that role directly — no
@@ -250,17 +383,83 @@ export function buildMapping(site, roles, mode, options = {}) {
    * that), so a colour we saw acting as a plate is not proof that *this*
    * variable is a plate — `--bg` still means the canvas.
    */
-  const resolveVariable = (name, color) => {
+  const resolveVariableDetailed = (name, color) => {
+    if (isWash(color)) return { color: flipWash ? toHex(roles[mode].text) : toHex(color), role: 'text' }
     const key = toHex(color)
     const role = roleFromVariableName(name)
-    if (role && roles[mode][role]) return keep(color, roles[mode][role])
-    if (plateKeys.has(key)) return keep(color, roles[mode].plate)
-    if (plateInkKeys.has(key)) return keep(color, roles[mode].plateFg)
-    if (chromaOf(color) >= 0.14) return resolve(color, 'foreground')
-    return resolve(color, kindOfVariable(name))
+    if (role && roles[mode][role]) return { color: keep(color, roles[mode][role]), role }
+    if (plateKeys.has(key)) return { color: keep(color, roles[mode].plate), role: 'plate' }
+    // plate ink is checked before the canvas, because on a light page the panel's
+    // ink and the page canvas are frequently the same hex
+    if (plateInkKeys.has(key)) return { color: keep(color, roles[mode].plateFg), role: 'plateFg' }
+    if (key === canvasKey) return { color: keep(color, roles[mode].canvas), role: 'canvas' }
+    if (chromaOf(color) >= 0.14) return resolveDetailed(color, 'foreground')
+    return resolveDetailed(color, kindOfVariable(name))
   }
 
-  return { resolve, resolveVariable, size: table.size, kindOf, kindOfVariable }
+  const resolveVariable = (name, color) => resolveVariableDetailed(name, color).color
+
+  /**
+   * Should a translucent text colour keep its transparency?
+   *
+   * A site paints `.zen-banner p` as its panel ink at 72%. On a theme whose
+   * panel ink is bright that is still plenty readable. On Solarized, whose ink
+   * for that surface only clears 4.7:1 when solid, the 28% of background
+   * bleeding through drops it to 2.9:1.
+   *
+   * The backdrop has to be the one the colour is *for* — a plate ink is judged
+   * against the plate, not against the canvas it never sits on.
+   */
+  const ROLE_BACKDROP = {
+    text: 'canvas',
+    muted: 'canvas',
+    border: 'canvas',
+    borderStrong: 'canvas',
+    canvas: 'canvas',
+    surface: 'canvas',
+    surfaceAlt: 'canvas',
+    accent: 'canvas',
+    highlight: 'canvas',
+    positive: 'canvas',
+    warning: 'canvas',
+    danger: 'canvas',
+    accentFg: 'accent',
+    highlightFg: 'highlight',
+    plate: 'plate',
+    plateFg: 'plate',
+    codeBg: 'plate',
+    codeFg: 'codeBg',
+    codeKeyword: 'codeBg',
+    codeFunction: 'codeBg',
+    codeNumber: 'codeBg',
+    codeMuted: 'codeBg',
+  }
+
+  /**
+   * Body text can land on the page canvas *or* on a dark band, and the mapping
+   * cannot tell which from the colour alone. So a text-role transparency has to
+   * survive both, or it is not safe to keep.
+   */
+  const TEXT_ROLES = new Set(['text', 'muted'])
+  const keepTranslucency = (role, mapped, alpha) => {
+    const backdrops = [roles[mode][ROLE_BACKDROP[role] ?? 'canvas']]
+    if (TEXT_ROLES.has(role)) backdrops.push(roles[mode].plate)
+    return backdrops.every((backdrop) => {
+      const composed = composite(rgba(mapped, alpha), backdrop)
+      return contrast(composed, backdrop) >= 4.5
+    })
+  }
+
+  return {
+    resolve,
+    resolveVariable,
+    resolveDetailed,
+    resolveVariableDetailed,
+    keepTranslucency,
+    size: table.size,
+    kindOf,
+    kindOfVariable,
+  }
 }
 
 /** Rewrite every colour token inside an arbitrary CSS value. */
@@ -269,10 +468,17 @@ export function remapValue(value, mapping, kind = 'foreground') {
   const output = value.replace(COLOR_TOKEN, (token) => {
     const parsed = parseColor(token)
     if (!parsed) return token
-    const mapped = mapping.resolve(token, kind)
-    if (toHex(token) === toHex(mapped)) return token
+    const { color: mapped, role } = mapping.resolveDetailed(token, kind)
+    const differs = toHex(token) !== toHex(mapped)
+    // a translucent text colour that would fall under AA on the surface it is
+    // actually for goes opaque instead — see keepTranslucency
+    const keepAlpha =
+      parsed.a >= 1 ||
+      kind !== 'foreground' ||
+      mapping.keepTranslucency(role, mapped, Number(parsed.a.toFixed(3)))
+    if (!differs && keepAlpha) return token
     changed = true
-    return parsed.a >= 1 ? mapped : rgba(mapped, Number(parsed.a.toFixed(3)))
+    return keepAlpha ? rgba(mapped, Number(parsed.a.toFixed(3))) : mapped
   })
   return changed ? output : null
 }
@@ -288,8 +494,16 @@ export function buildColorCss(site, mapping, options = {}) {
   const out = []
 
   for (const { selector, name, color } of site.customProps ?? []) {
-    const mapped = mapping.resolveVariable(name, color)
-    if (toHex(mapped) !== toHex(color)) out.push(`${selector}{${name}:${mapped} !important}`)
+    const { color: mapped, role } = mapping.resolveVariableDetailed(name, color)
+    if (toHex(mapped) === toHex(color)) continue
+    const source = parseColor(color)
+    const kind = mapping.kindOfVariable(name)
+    // a translucent text token goes opaque when the theme cannot carry it; a
+    // background wash keeps its transparency either way
+    const translucent =
+      source.a < 1 && (kind !== 'foreground' || mapping.keepTranslucency(role, mapped, Number(source.a.toFixed(3))))
+    const value = translucent ? rgba(mapped, Number(source.a.toFixed(3))) : mapped
+    out.push(`${selector}{${name}:${value} !important}`)
   }
 
   for (const { selector, prop, value } of site.declarations ?? []) {
