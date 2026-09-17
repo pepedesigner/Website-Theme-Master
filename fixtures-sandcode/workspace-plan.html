@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en" class="auth-locked"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SandCode Console — Coding Plan</title>
+<link rel="stylesheet" href="./fonts.css?v=24">
+<link rel="stylesheet" href="./tokens.css?v=24">
+<link rel="stylesheet" href="./workspace.css?v=24">
+<link rel="stylesheet" href="./buttons.css?v=24">
+<link rel="stylesheet" href="./chrome.css?v=24">
+<link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="./fonts/clash-grotesk-variable.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/geist-mono-latin.woff2" crossorigin>
+<meta name="description" content="SandCode Console Coding Plan — 6h window, reasoning sub-quota, cache savings, tool water meters and live traces (mock demo).">
+<meta property="og:title" content="SandCode Console — Coding Plan">
+<meta property="og:description" content="SandCode Console Coding Plan — 6h window, reasoning sub-quota, cache savings, tool water meters and live traces (mock demo).">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://sandcode.ai/workspace-plan.html">
+<meta property="og:url" content="https://sandcode.ai/workspace-plan.html">
+<meta property="og:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SandCode — flat-rate coding compute for every agent client">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:site_name" content="SandCode">
+<style>html.auth-locked body{visibility:hidden}html.auth-locked .auth-nojs{visibility:visible}</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><div class="auth-nojs"><h1>Sign-in needs JavaScript</h1><p>The console keeps your session in this browser, so it cannot open without scripts. Turn JavaScript on and reload this page.</p></div></noscript>
+<script>try{var t=localStorage.getItem('sandcode-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.body.dataset.theme=t}catch(e){}</script>
+<script>try{if(localStorage.getItem('sandcode-auth'))document.documentElement.classList.remove('auth-locked');else location.replace('./signin.html')}catch(e){location.replace('./signin.html')}</script>
+<script>try{var l=(localStorage.getItem('sandcode-lang')||(navigator.languages&&navigator.languages[0])||navigator.language||'en').toLowerCase().split('-')[0],d=document.documentElement;if('en zh ja ko es de fr pt ru'.split(' ').indexOf(l)<0)l='en';window.__sandLang=l;d.lang=l;if(l!=='en'){d.classList.add('i18n-pending');setTimeout(function(){d.classList.remove('i18n-pending')},3000);var p=document.createElement('link');p.rel='preload';p.as='script';p.href='./i18n-'+l+'.js?v=24';document.head.appendChild(p)}}catch(e){}</script>
+<div id="app">
+  <aside id="side"></aside>
+  <div id="side-scrim" hidden></div>
+  <main id="main" tabindex="-1" class="main">
+    <header id="topbar"></header>
+    <div class="ws-page"><div class="ws-inner">
+      <h1>Coding plan</h1>
+      <p class="ws-sub">Windows, tools and traces · mock data.</p>
+      <div class="ws-grid">
+        <div class="ws-card"><h2>6h rolling window</h2><div class="big">32%</div>
+          <div class="ubar"><i style="width:32%"></i></div>
+          <div class="urow"><span><span>used</span> $4.80 · <span>left</span> $10.20</span><span>oldest request ages out in 42m</span></div></div>
+        <div class="ws-card"><h2>Reasoning sub-quota</h2><div class="big">21%</div>
+          <div class="ubar"><i style="width:21%"></i></div>
+          <div class="urow"><span><span>used</span> $4.20 · <span>left</span> $15.80</span><span>V4.1 Pro · GLM 5.2</span></div></div>
+      </div>
+      <div class="ws-grid">
+        <div class="ws-card"><h2>Prompt caching savings</h2><div class="big">$42.10</div>
+          <p>Last 7 days · 80% hit rate · ≈2.8× effective purchasing power.</p>
+          <div class="btnrow"><button class="wbtn ghost" id="share-savings" type="button">Share weekly report</button></div></div>
+        <div class="ws-card"><h2>Tool quota (MCP)</h2>
+          <div class="ubar"><i style="width:14%"></i></div>
+          <div class="urow"><span>Search</span><span><span>used</span> 68 of 500 · <span>left</span> 432 · 14%</span></div>
+          <div class="ubar"><i style="width:2%"></i></div>
+          <div class="urow"><span>Scrape</span><span><span>used</span> 12 of 500 · <span>left</span> 488 · 2%</span></div></div>
+      </div>
+      <div class="ws-card" style="margin-bottom:14px"><h2>Weekly and monthly</h2>
+        <div class="ubar"><i style="width:53%"></i></div>
+        <div class="urow"><span>Weekly</span><span><span>used</span> $18.40 · <span>left</span> $16.60 · 53%</span></div>
+        <div class="ubar"><i style="width:59%"></i></div>
+        <div class="urow"><span>Monthly</span><span><span>used</span> $41.60 · <span>left</span> $28.40 · 59%</span></div>
+      </div>
+      <div class="ws-card" style="margin-bottom:14px"><h2>Live traces</h2>
+        <table aria-label="Live traces" class="utable"><thead><tr><th scope="col">Time</th><th scope="col">Client</th><th scope="col">Model</th><th scope="col" class="num">Tokens (cached / out)</th><th scope="col" class="num">Latency</th><th scope="col" class="num">Cost</th><th scope="col">Status</th></tr></thead>
+        <tbody>
+        <tr><td class="mono">17:24:02</td><td>Cursor</td><td><code>deepseek-v4.1-flash</code></td><td class="num">84,200 (80,000) / 420</td><td class="num">0.8s</td><td class="num">$0.0035</td><td>200</td></tr>
+        <tr><td class="mono">17:21:15</td><td>Claude Code</td><td><code>deepseek-v4.1-pro</code></td><td class="num">120,400 (96,000) / 3,100</td><td class="num">4.2s</td><td class="num">$0.0487</td><td>200</td></tr>
+        <tr><td class="mono">17:18:40</td><td>Cursor</td><td><code>cloudsway/search</code></td><td class="num">Next.js cookies()</td><td class="num">0.3s</td><td class="num">$0.0000</td><td>200</td></tr>
+        <tr><td class="mono">17:15:02</td><td>Antigravity</td><td><code>tencent/hy3</code></td><td class="num">12,000 (0) / 840</td><td class="num">0.7s</td><td class="num">$0.0020</td><td>200</td></tr>
+        </tbody></table>
+        <p class="ws-note">A $0.0000 tool call is still inside the included monthly allowance. Traces are recorded only for sessions you opted into.</p></div>
+      <div class="ws-card"><h2>Overflow protection</h2>
+        <div class="switchrow"><div>PAYG wallet overflow<small>When the 6h window is spent, draw on the wallet balance.</small></div>
+          <label class="switch"><input type="checkbox" checked data-toast="PAYG overflow on" aria-label="PAYG wallet overflow"><em></em></label></div>
+        <div class="switchrow"><div>Survival tier<small>Fall back to hy3-preview at 3 RPM once the quota is spent.</small></div>
+          <label class="switch"><input type="checkbox" checked data-toast="Survival tier on" aria-label="Survival tier"><em></em></label></div>
+        <div class="switchrow"><div>Daily burst<small>Today 1 of 1 used — raises the current 6h ceiling by $5.</small></div>
+          <label class="switch"><input type="checkbox" data-toast="Burst used" aria-label="Daily burst"><em></em></label></div>
+        <div class="switchrow"><div>Alerts<small>Email and Discord webhook at 80% and 95% of the pool.</small></div>
+          <label class="switch"><input type="checkbox" checked data-toast="Alerts on" aria-label="Alerts"><em></em></label></div>
+        <div class="urow" style="margin-top:12px"><span>PAYG wallet balance</span><span>$15.00</span></div>
+      </div>
+    </div></div>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="./chrome.js?v=24"></script>
+<script src="./i18n.js?v=24"></script>
+<script src="./common.js?v=24"></script>
+<script src="./workspace-pages.js?v=24"></script>
+</body></html>

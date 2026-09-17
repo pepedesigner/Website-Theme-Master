@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en" class="auth-locked"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SandCode Console — Usage</title>
+<link rel="stylesheet" href="./fonts.css?v=24">
+<link rel="stylesheet" href="./tokens.css?v=24">
+<link rel="stylesheet" href="./workspace.css?v=24">
+<link rel="stylesheet" href="./buttons.css?v=24">
+<link rel="stylesheet" href="./chrome.css?v=24">
+<link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="./fonts/clash-grotesk-variable.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/geist-mono-latin.woff2" crossorigin>
+<meta name="description" content="SandCode Console usage — daily spend, per-model and per-client breakdown (mock demo).">
+<meta property="og:title" content="SandCode Console — Usage">
+<meta property="og:description" content="SandCode Console usage — daily spend, per-model and per-client breakdown (mock demo).">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://sandcode.ai/workspace-usage.html">
+<meta property="og:url" content="https://sandcode.ai/workspace-usage.html">
+<meta property="og:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SandCode — flat-rate coding compute for every agent client">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:site_name" content="SandCode">
+<style>html.auth-locked body{visibility:hidden}html.auth-locked .auth-nojs{visibility:visible}</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><div class="auth-nojs"><h1>Sign-in needs JavaScript</h1><p>The console keeps your session in this browser, so it cannot open without scripts. Turn JavaScript on and reload this page.</p></div></noscript>
+<script>try{var t=localStorage.getItem('sandcode-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.body.dataset.theme=t}catch(e){}</script>
+<script>try{if(localStorage.getItem('sandcode-auth'))document.documentElement.classList.remove('auth-locked');else location.replace('./signin.html')}catch(e){location.replace('./signin.html')}</script>
+<script>try{var l=(localStorage.getItem('sandcode-lang')||(navigator.languages&&navigator.languages[0])||navigator.language||'en').toLowerCase().split('-')[0],d=document.documentElement;if('en zh ja ko es de fr pt ru'.split(' ').indexOf(l)<0)l='en';window.__sandLang=l;d.lang=l;if(l!=='en'){d.classList.add('i18n-pending');setTimeout(function(){d.classList.remove('i18n-pending')},3000);var p=document.createElement('link');p.rel='preload';p.as='script';p.href='./i18n-'+l+'.js?v=24';document.head.appendChild(p)}}catch(e){}</script>
+<div id="app">
+  <aside id="side"></aside>
+  <div id="side-scrim" hidden></div>
+  <main id="main" tabindex="-1" class="main">
+    <header id="topbar"></header>
+    <div class="ws-page"><div class="ws-inner">
+      <h1>Usage</h1>
+      <p class="ws-sub">This month so far · per-model and per-client · mock data.</p>
+      <div class="ws-grid">
+        <div class="ws-card"><h2>Spend · month</h2><div class="big">$41.60</div><p>vs $45.30 previous period</p></div>
+        <div class="ws-card"><h2>Requests · month</h2><div class="big">12.4K</div><p>8.1M tokens · 96% tool-call success</p></div>
+      </div>
+      <div class="ws-card" style="margin-bottom:14px"><h2>Daily spend</h2><div class="dbars" id="daily-bars"></div>
+        <div class="urow" style="margin-top:8px"><span>Sep 1</span><span>Sep 14</span></div></div>
+      <div class="ws-grid">
+        <div class="ws-card"><h2>By model</h2>
+          <table aria-label="By model" class="utable"><thead><tr><th scope="col">Model</th><th scope="col" class="num">Requests</th><th scope="col" class="num">Tokens</th><th scope="col" class="num">Cost</th></tr></thead>
+          <tbody><tr><td><code>deepseek-v4.1-flash</code></td><td class="num">6,104</td><td class="num">4.2M</td><td class="num"><span class="share" aria-hidden="true"><i style="width:51%"></i></span>$21.20</td></tr>
+          <tr><td><code>tencent/hy3</code></td><td class="num">3,208</td><td class="num">2.1M</td><td class="num"><span class="share" aria-hidden="true"><i style="width:29%"></i></span>$12.00</td></tr>
+          <tr><td><code>minimax-m3</code></td><td class="num">1,930</td><td class="num">1.4M</td><td class="num"><span class="share" aria-hidden="true"><i style="width:17%"></i></span>$7.00</td></tr>
+          <tr><td><code>deepseek-v4.1-pro</code></td><td class="num">640</td><td class="num">0.3M</td><td class="num"><span class="share" aria-hidden="true"><i style="width:3%"></i></span>$1.05</td></tr>
+          <tr><td><code>z-ai/glm-5.2</code></td><td class="num">380</td><td class="num">0.1M</td><td class="num"><span class="share" aria-hidden="true"><i style="width:1%"></i></span>$0.35</td></tr>
+          <tr><td><code>claude-sonnet-5</code></td><td class="num">138</td><td class="num">0.1M</td><td class="num">BYOK</td></tr></tbody></table></div>
+        <div class="ws-card"><h2>By client</h2>
+          <table aria-label="By client" class="utable"><thead><tr><th scope="col">Client</th><th scope="col" class="num">Requests</th><th scope="col" class="num">Share</th></tr></thead>
+          <tbody><tr><td>Cursor</td><td class="num">7,100</td><td class="num"><span class="share" aria-hidden="true"><i style="width:57%"></i></span>57%</td></tr>
+          <tr><td>Claude Code</td><td class="num">3,240</td><td class="num"><span class="share" aria-hidden="true"><i style="width:26%"></i></span>26%</td></tr>
+          <tr><td>Antigravity</td><td class="num">1,320</td><td class="num"><span class="share" aria-hidden="true"><i style="width:11%"></i></span>11%</td></tr>
+          <tr><td>OpenCode</td><td class="num">740</td><td class="num"><span class="share" aria-hidden="true"><i style="width:6%"></i></span>6%</td></tr></tbody></table>
+          <p class="ws-note">One account, one pool. Every client draws on the same quota and the same 5-request concurrency limit.</p></div>
+      </div>
+    </div></div>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="./chrome.js?v=24"></script>
+<script src="./i18n.js?v=24"></script>
+<script src="./common.js?v=24"></script>
+<script src="./workspace-pages.js?v=24"></script>
+</body></html>

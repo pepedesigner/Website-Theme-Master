@@ -1,0 +1,17 @@
+{
+  "name": "website-theme-master",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Point it at a website, give it a theme: colour, type, shape and motion, restyled live.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.mjs 4180",
+    "themes": "node tools/import-themes.mjs",
+    "shoot": "node tools/shoot.mjs",
+    "smoke": "node tools/smoke.mjs",
+    "verify": "node tools/verify-details.mjs"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
+  }
+}

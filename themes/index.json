@@ -1,0 +1,138 @@
+[
+  {
+    "id": "sandbase",
+    "label": "SandBase"
+  },
+  {
+    "id": "aura",
+    "label": "Aura"
+  },
+  {
+    "id": "ayu",
+    "label": "Ayu"
+  },
+  {
+    "id": "carbonfox",
+    "label": "Carbonfox"
+  },
+  {
+    "id": "catppuccin-frappe",
+    "label": "Catppuccin Frappé"
+  },
+  {
+    "id": "catppuccin",
+    "label": "Catppuccin Latte"
+  },
+  {
+    "id": "catppuccin-macchiato",
+    "label": "Catppuccin Macchiato"
+  },
+  {
+    "id": "cobalt2",
+    "label": "Cobalt 2"
+  },
+  {
+    "id": "cursor",
+    "label": "Cursor"
+  },
+  {
+    "id": "dracula",
+    "label": "Dracula"
+  },
+  {
+    "id": "everforest",
+    "label": "Everforest"
+  },
+  {
+    "id": "flexoki",
+    "label": "Flexoki"
+  },
+  {
+    "id": "github",
+    "label": "GitHub"
+  },
+  {
+    "id": "gruvbox",
+    "label": "Gruvbox"
+  },
+  {
+    "id": "kanagawa",
+    "label": "Kanagawa"
+  },
+  {
+    "id": "lucent-orng",
+    "label": "Lucent Orange"
+  },
+  {
+    "id": "material",
+    "label": "Material"
+  },
+  {
+    "id": "matrix",
+    "label": "Matrix"
+  },
+  {
+    "id": "mercury",
+    "label": "Mercury"
+  },
+  {
+    "id": "monokai",
+    "label": "Monokai"
+  },
+  {
+    "id": "nightowl",
+    "label": "Night Owl"
+  },
+  {
+    "id": "nord",
+    "label": "Nord"
+  },
+  {
+    "id": "one-dark",
+    "label": "One Dark"
+  },
+  {
+    "id": "opencode",
+    "label": "OpenCode"
+  },
+  {
+    "id": "orng",
+    "label": "Orange"
+  },
+  {
+    "id": "osaka-jade",
+    "label": "Osaka Jade"
+  },
+  {
+    "id": "palenight",
+    "label": "Palenight"
+  },
+  {
+    "id": "rosepine",
+    "label": "Rosé Pine"
+  },
+  {
+    "id": "solarized",
+    "label": "Solarized"
+  },
+  {
+    "id": "synthwave84",
+    "label": "Synthwave 84"
+  },
+  {
+    "id": "tokyonight",
+    "label": "Tokyo Night"
+  },
+  {
+    "id": "vercel",
+    "label": "Vercel"
+  },
+  {
+    "id": "vesper",
+    "label": "Vesper"
+  },
+  {
+    "id": "zenburn",
+    "label": "Zenburn"
+  }
+]

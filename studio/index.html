@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Website Theme Master</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/studio/studio.css">
+</head>
+<body>
+
+<header class="bar">
+  <div class="brand">Website <b>Theme Master</b></div>
+
+  <form class="target" id="target-form">
+    <div class="seg" id="target-kind" role="group" aria-label="Target kind">
+      <button type="button" data-kind="local" aria-pressed="true">Folder</button>
+      <button type="button" data-kind="url" aria-pressed="false">URL</button>
+    </div>
+    <input id="target-input" type="text" spellcheck="false" aria-label="Site to reskin"
+      placeholder="/path/to/site or https://example.com">
+    <button type="submit" class="primary">Load</button>
+  </form>
+
+  <div class="status" id="status" role="status" aria-live="polite">Loading…</div>
+</header>
+
+<main>
+  <section class="stage">
+    <div class="stage-bar">
+      <span class="stage-title" id="stage-title">—</span>
+      <div class="seg" id="mode" role="group" aria-label="Theme mode">
+        <button type="button" data-mode="light" aria-pressed="true">Light</button>
+        <button type="button" data-mode="dark" aria-pressed="false">Dark</button>
+      </div>
+      <button type="button" class="ghost" id="reanalyze">Re-analyse</button>
+      <span class="pill" id="mapping-pill">—</span>
+    </div>
+    <div class="frame">
+      <iframe id="preview" title="Site preview"></iframe>
+      <div class="curtain" id="curtain"><span>Reskinning…</span></div>
+    </div>
+  </section>
+
+  <aside class="panel">
+
+    <section class="group">
+      <h2>Theme</h2>
+      <input type="search" id="theme-filter" placeholder="Filter themes" aria-label="Filter themes">
+      <div class="themes" id="themes"></div>
+    </section>
+
+    <section class="group">
+      <h2>Colour</h2>
+      <label class="row">
+        <span>Intensity</span>
+        <input type="range" id="strength" min="0" max="100" value="100">
+        <output id="strength-out">100%</output>
+      </label>
+      <p class="hint">How far the site's own colours are pushed toward the theme. 0% leaves the
+        palette untouched on purpose, which is the fastest way to compare.</p>
+    </section>
+
+    <section class="group">
+      <h2>Typography</h2>
+      <label class="row"><span>Body font</span>
+        <select id="bodyFont"></select></label>
+      <label class="row"><span>Headings</span>
+        <select id="headingFont"></select></label>
+      <label class="row"><span>Type scale</span>
+        <select id="typeScale"></select></label>
+      <label class="row"><span>Line height</span>
+        <select id="lineHeight"></select></label>
+      <label class="row"><span>Heading tracking</span>
+        <select id="headingTracking"></select></label>
+    </section>
+
+    <section class="group">
+      <h2>Shape</h2>
+      <label class="row">
+        <span>Corner radius</span>
+        <input type="range" id="radius" min="0" max="24" step="1" value="0">
+        <output id="radius-out">keep</output>
+      </label>
+      <label class="row"><span>Elevation</span>
+        <select id="elevation"></select></label>
+      <label class="row"><span>Borders</span>
+        <select id="borders"></select></label>
+    </section>
+
+    <section class="group">
+      <h2>Motion</h2>
+      <label class="row"><span>Transitions</span>
+        <select id="motion"></select></label>
+    </section>
+
+    <section class="group">
+      <h2>Detected</h2>
+      <div class="detected" id="detected"><p class="hint">Nothing analysed yet.</p></div>
+    </section>
+
+    <section class="group">
+      <h2>Export</h2>
+      <div class="exports">
+        <button type="button" class="primary" id="export-css">Download CSS</button>
+        <button type="button" class="ghost" id="copy-css">Copy CSS</button>
+        <button type="button" class="ghost" id="export-json">Save config</button>
+      </div>
+      <p class="hint">The CSS is the whole reskin: drop it in after the site's own stylesheets.
+        It is generated from the live page, so it targets that page's real selectors.</p>
+    </section>
+
+  </aside>
+</main>
+
+<script type="module" src="/studio/studio.js"></script>
+</body>
+</html>

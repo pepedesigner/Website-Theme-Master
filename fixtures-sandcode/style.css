@@ -1,0 +1,497 @@
+/* Sandcode — SandBase-aligned marketing theme.
+   Light-first: an off-white canvas, white surfaces, hairline borders, one
+   violet accent and a lime highlight, square corners, no shadows.
+   Mono is the micro-label face (eyebrows, captions, table heads) and the code
+   face; body and headlines are the grotesk. Elevation comes from lightness +
+   hairlines, not shadows.
+   Dark mode (`body[data-theme="dark"]`) is a re-derivation in tokens.css. */
+/* All color/type/shape tokens are the single source of truth in tokens.css
+   (light default; dark re-derived via body[data-theme="dark"]). This file only
+   appends structural styles on top. */
+*{box-sizing:border-box}
+/* the inline bootstrap adds this class when 中文 is the stored language, so the
+   page never paints English first; i18n.js removes it once the dictionary has
+   been applied (the bootstrap also clears it after 2s as a safety net) */
+html.i18n-pending body{visibility:hidden}
+/* overflow-x:clip on the ROOT is what absorbs the full-bleed bands below. It
+   has to be the root: clipping on `main` would clip at main's padding box,
+   i.e. exactly where the bands need to escape. `clip` (not `hidden`) because a
+   clip container is not a scroll container, so it leaves the sticky header and
+   the docs sidebar working, and clip never adds scrollable overflow.
+   Deliberately NOT `scrollbar-gutter:stable`: reserving a gutter leaves a
+   blank strip the full-bleed bands cannot reach (a band sized to 100vw then
+   stops one gutter short, and the root's clip box ends there too). Without it
+   the only thing that can sit in that strip is a real scrollbar, which paints
+   opaque over the band. */
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--header-h) + 16px);overflow-x:clip}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:var(--font-sans);
+  font-size:var(--text-body); line-height:1.5;
+  /* Safety net for the long compound words German and Russian build. Without
+     it a single unbreakable word in a 40px headline is wider than a 360px
+     phone and scrolls the whole page sideways; the break only happens when the
+     word genuinely does not fit, so normal copy is untouched. */
+  overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+}
+::selection{background:var(--mark-bg);color:var(--mark-fg)}
+code,pre,.cmd,.terminal,.term-body,.uc-term{font-family:var(--font-mono)}
+a{color:inherit}
+a:focus-visible,button:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:0}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+/* full-bleed band: escapes .wrap, then re-insets its content to the same
+   measure so banded and un-banded sections stay optically aligned.
+   The maths is measure-independent: 50% is half the parent's content box, so
+   `50% - 50vw` walks exactly out to the viewport edge at any width. */
+.band{
+  width:100vw;
+  margin-left:calc(50% - 50vw);
+  padding-left:calc(50vw - 50%);
+  padding-right:calc(50vw - 50%);
+}
+.band-mint{background:var(--tint-mint)}
+h1,h2{font-family:var(--font-display);font-weight:500;letter-spacing:-.02em;text-wrap:balance;line-height:1.1}
+/* the reference's <mark> highlight, applied to the <em> the markup already has */
+h1 em,h2 em{
+  font-style:normal;background:var(--mark-bg);color:var(--mark-fg);
+  padding:.02em .18em;box-decoration-break:clone;-webkit-box-decoration-break:clone;
+}
+
+/* ---------- header ---------- */
+.site-header{position:sticky;top:0;z-index:var(--z-header);background:var(--chrome-bg);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  border-bottom:1px solid transparent;transition:transform .32s var(--ease)}
+.site-header.nav-hidden{transform:translateY(-100%)}
+/* scroll progress + back-to-top + scroll hint */
+.progress{position:fixed;top:0;left:0;right:0;height:2px;background:var(--accent);
+  transform:scaleX(0);transform-origin:left;z-index:var(--z-toast)}
+/* shape/size/fill live in buttons.css — placement + show/hide only here */
+#toTop{position:fixed;right:22px;bottom:22px;
+  opacity:0;pointer-events:none;transform:translateY(12px);z-index:var(--z-fab)}
+#toTop.show{opacity:1;pointer-events:auto;transform:none}
+.scroll-hint{display:flex;justify-content:center;margin-top:26px}
+.scroll-hint span{width:22px;height:22px;border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:rotate(45deg);animation:hint 1.8s var(--ease) infinite}
+@keyframes hint{0%{transform:rotate(45deg) translate(0,0);opacity:.9}50%{transform:rotate(45deg) translate(7px,7px);opacity:.35}100%{transform:rotate(45deg) translate(0,0);opacity:.9}}
+.nav{position:relative;display:flex;align-items:center;gap:16px;min-height:var(--header-h)}
+.logo{font-family:var(--font-sans);font-weight:550;letter-spacing:-.018em;font-size:var(--text-logo);text-decoration:none;
+  flex:none;color:var(--ink)}
+.logo span{color:var(--ink)}
+.logo i{font-style:normal;color:var(--accent);margin-left:1px}
+.menu-btn{margin-left:auto;flex:none}
+.nav-links{display:flex;gap:2px;margin-left:auto;align-items:center;flex:none;flex-wrap:nowrap;white-space:nowrap}
+.nav-links a{position:relative;text-decoration:none;font-size:var(--text-body-sm);font-weight:500;color:var(--muted);
+  padding:9px 12px;border-radius:0;transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.nav-links a:not(.btn):hover{background:var(--tint-hover);color:var(--ink)}
+/* the label stays ink (accent-on-tint was 4.08:1, under AA); the accent
+   carries the state as a rule, which only needs 3:1 as a non-text indicator */
+.nav-links a:not(.btn).active{background:var(--bg3);color:var(--ink);font-weight:600;
+  box-shadow:inset 0 -2px 0 var(--accent)}
+.theme-btn{flex:none;margin-left:8px}
+/* The nav owns its CTA's margins. `.btn` carries a document-flow margin further
+   down this file, and a top margin there is not neutral in a centred flex row:
+   it shifts the box down by half of it, which is what left the Install button
+   sitting 4px below the controls beside it. */
+.nav-links a.btn{margin:0 0 0 10px}
+
+/* ---------- micro-label ---------- */
+/* one spec for every mono caption: eyebrows, badges, column heads */
+.eyebrow,.badge{
+  font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--muted);
+}
+
+/* ---------- hero ---------- */
+.hero{padding:96px 0 30px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);
+  background:var(--bg2);padding:8px 14px;margin-bottom:28px}
+.badge::before{content:"";width:7px;height:7px;background:var(--positive);flex:none}
+.badge a{font-weight:600;text-decoration:none;border-bottom:1px solid currentColor;color:var(--ink)}
+h1{font-size:var(--text-hero);line-height:1.06;letter-spacing:-.025em;margin:0 0 22px}
+.sub{color:var(--muted);max-width:640px;margin:0 auto 26px;font-size:var(--text-lede);line-height:1.55}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:34px}
+
+/* ---------- hero interactive dot grid ---------- */
+/* The canvas is generated by script.js, spans the viewport width and hides
+   behind the hero content (`z-index:-1` inside the hero's own stacking
+   context). It stops at the terminal frame and fades out well before it, so
+   the grid never cuts a hard edge against an opaque panel. */
+.hero[data-hero-dots]{position:relative;isolation:isolate}
+.hero-dots{position:absolute;top:0;left:0;z-index:var(--z-hero);pointer-events:none;
+  -webkit-mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 92%);
+          mask-image:linear-gradient(to bottom,#000 0%,#000 52%,transparent 92%)}
+
+/* ---------- install ---------- */
+.install{background:var(--panel);border-radius:0;
+  margin:0 auto;max-width:680px;overflow:hidden;text-align:left}
+.tabs{display:flex;border-bottom:1px solid rgba(242,240,243,.14);overflow-x:auto;background:transparent}
+.tabs button{flex:1;background:transparent;border:0;border-right:1px solid rgba(242,240,243,.14);padding:13px 10px;
+  font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--code-muted);cursor:pointer;min-width:88px;
+  transition:background var(--t-fast) var(--ease),color var(--t-fast) var(--ease)}
+.tabs button:last-child{border-right:0}
+/* the strip scrolls (overflow-x:auto), so an outside focus ring is clipped to a
+   sliver on the first/last tab — inset it so the whole ring stays visible */
+.tabs button:focus-visible{outline-offset:-3px}
+.tabs button:hover{background:rgba(242,240,243,.08);color:var(--panel-fg)}
+.tabs button.active{background:rgba(242,240,243,.1);color:var(--panel-fg);box-shadow:inset 0 -2px 0 var(--code-accent)}
+.cmd{display:flex;align-items:center;gap:12px;background:var(--panel);color:var(--code-fg);
+  padding:18px;font-size:var(--text-body-2xs);overflow-x:auto;border-top:1px solid rgba(242,240,243,.14)}
+.cmd code{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cmd .prompt{color:var(--code-accent)}   /* stays readable on the dark code canvas */
+/* fill is context-specific; shape/size/type come from buttons.css */
+.copy{margin-left:auto;flex:none}
+
+/* ---------- terminal product frame ---------- */
+/* the terminal is a code surface: dark in both themes, like .cmd/.uc-term/.doc pre.
+   No border: a --line-strong edge would be a black outline in light and a bright
+   white one in dark, and the panel's own contrast against the canvas is the frame
+   (the reference's bg-panel has none either). */
+.terminal{background:var(--panel);color:var(--code-fg);margin:26px auto 0;max-width:860px;
+  border-radius:0;overflow:hidden;text-align:left;position:relative}
+.term-bar{display:flex;gap:7px;align-items:center;padding:14px 18px;border-bottom:1px solid rgba(242,240,243,.14)}
+.term-bar .tname{font-family:var(--font-mono);font-size:var(--text-caption);color:var(--code-muted);margin-left:10px}
+.term-bar .tlang{margin-left:auto;font-family:var(--font-mono);font-size:var(--text-label-sm);color:var(--code-muted);
+  letter-spacing:var(--tracking-label);text-transform:uppercase}
+/* square marks, not traffic lights — the reference's corner language */
+.dot{width:10px;height:10px;border-radius:0;background:rgba(242,240,243,.22);flex:none}
+.dot:nth-child(1){background:var(--code-accent)}
+.dot:nth-child(2){background:var(--code-bright)}
+.term-body{padding:24px;font-size:var(--text-body-2xs);min-height:330px;color:var(--code-fg)}
+#term-typing{display:block;min-height:280px;margin:0;white-space:pre-wrap;font-size:13px}
+.t-line{min-height:1.65em;white-space:pre-wrap}
+/* session palette — these sit on the dark code canvas in both themes */
+.t-prompt,.t-ok{color:var(--code-accent)}
+.t-cmd{color:var(--code-fg)}
+.t-strong{color:var(--code-fg);font-weight:600}
+.t-dim{color:var(--code-muted)}
+.t-file{color:var(--code-accent)}
+.t-num{color:var(--code-warn)}
+.t-key{color:var(--code-bright)}
+.t-caret{display:inline-block;width:7px;height:1.02em;margin-left:2px;vertical-align:-1px;
+  background:var(--code-accent);animation:caret 1.05s steps(1,end) infinite}
+@keyframes caret{0%,49%{opacity:1}50%,100%{opacity:0}}
+.green{color:var(--positive)}
+.prompt{color:var(--code-accent)}
+
+/* ---------- logo strip ---------- */
+.logos{padding:48px 0 8px;text-align:center;overflow:hidden}
+.logos p{font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--muted);margin:0 0 20px}
+/* --muted, not the reference's ink-subtle: #757183 only reaches 4.17:1 on the
+   canvas, and at 19px this is not large text, so it needs the full 4.5 */
+.logo-row{display:flex;gap:0;justify-content:flex-start;width:max-content;margin:0 auto;align-items:baseline;color:var(--muted)}
+.logo-row span{font-size:19px;white-space:nowrap;margin-right:38px;font-weight:500;letter-spacing:-.01em}
+.logo-row span:nth-child(odd){font-family:var(--font-mono);font-weight:500}
+/* script.js appends a second copy of the strip, so -50% is exactly one copy and
+   the loop is seamless. Desktop only: below 761px the row wraps instead. */
+@media(min-width:761px) and (prefers-reduced-motion:no-preference){
+  .logo-row{animation:marquee 26s linear infinite}
+  .logos:hover .logo-row{animation-play-state:paused}
+}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ---------- hero entrance ----------
+   Plays on load rather than on scroll, so it is pure CSS — a keyframe with a
+   stagger through animation-delay, which the compositor runs off the main
+   thread. `both` holds the from-state through the delay, so nothing flashes in
+   before its turn. Under reduced motion none of it runs and the hero is simply
+   there. */
+@media(prefers-reduced-motion:no-preference){
+  .hero .badge,.hero h1,.hero .sub,.hero-ctas,.hero .install,.hero .terminal,.logos{
+    animation:hero-in .9s var(--ease) both;
+  }
+  .hero .badge{animation-delay:.1s}
+  .hero h1{animation-delay:.19s}
+  .hero .sub{animation-delay:.28s}
+  .hero-ctas{animation-delay:.37s}
+  .hero .install{animation-delay:.46s}
+  .hero .terminal{animation-delay:.55s}
+  .logos{animation-delay:.64s}
+}
+@keyframes hero-in{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
+
+/* ---------- sections ---------- */
+section.block{padding-block:clamp(56px,8vw,88px);border-top:1px solid var(--line);text-align:center}
+section.block.band{border-top:0}
+section.block .sub{margin-left:auto;margin-right:auto}
+h2{font-size:var(--text-h2);margin:0 0 14px;letter-spacing:-.01em}
+/* the section label is muted, as in the reference; the accent carries the
+   running number, where it still clears AA on the tinted bands */
+.eyebrow{display:inline-block;font-weight:500;color:var(--muted);margin-bottom:16px}
+main{counter-reset:sec}
+section.block .eyebrow::before{counter-increment:sec;content:"0" counter(sec);margin-right:10px;
+  font-family:var(--font-mono);letter-spacing:0;color:var(--accent)}
+.stat strong,.price,.compare td{font-variant-numeric:tabular-nums}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin-top:32px;text-align:left;
+  background:var(--line);border:1px solid var(--line)}
+.card{background:var(--card);padding:26px;border-radius:0;border:0;
+  transition:background var(--t-med) var(--ease),color var(--t-med) var(--ease)}
+.card:hover{background:var(--bg3)}
+.card b{display:block;margin-bottom:8px;font-size:var(--text-body-sm);font-weight:600}
+.card p{margin:0;color:var(--muted);font-size:var(--text-body-sm);line-height:1.55}
+
+/* features — numbered rows, hairline separators */
+.features{max-width:780px;margin:40px auto 0;text-align:left;counter-reset:feat}
+.feat{display:grid;grid-template-columns:40px 20px 1fr;gap:15px;align-items:start;padding:20px 4px;border-top:1px solid var(--line)}
+.feat:last-child{border-bottom:1px solid var(--line)}
+.feat::before{counter-increment:feat;content:"0" counter(feat);font-family:var(--font-mono);
+  font-size:var(--text-body-2xs);color:var(--accent)}
+.feat svg{color:var(--accent);flex:none;margin-top:4px}
+.feat p{margin:0;font-size:var(--text-body-sm);line-height:1.6;color:var(--muted)}
+.feat p b{color:var(--ink);font-weight:600}
+
+/* technical grid — container carries top/left, every cell carries right/bottom */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:32px;
+  border-top:1px solid var(--line);border-left:1px solid var(--line);background:var(--bg2)}
+.stat{padding:34px 16px;font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted);
+  border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat strong{font-family:var(--font-sans);font-weight:500;font-size:clamp(2.25rem,4vw,2.875rem);
+  color:var(--ink);display:block;letter-spacing:-.03em;line-height:1.04;text-transform:none}
+
+/* ---------- faq ---------- */
+.faq{margin:32px auto 0;max-width:820px;text-align:left;display:flex;flex-direction:column;gap:1px;background:var(--line)}
+.faq details{background:var(--card);padding:4px 22px}
+.faq summary{cursor:pointer;font-weight:500;font-size:var(--text-card-title);letter-spacing:-.011em;
+  list-style:none;display:flex;gap:14px;align-items:baseline;padding:18px 0}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::before{content:"+";color:var(--accent);flex:none;font-family:var(--font-mono);font-weight:500}
+.faq details[open] summary::before{content:"–"}
+.faq p{color:var(--muted);margin:0 0 20px 24px;font-size:var(--text-body);line-height:1.55;max-width:40rem}
+
+/* ---------- banners ---------- */
+/* the closing CTA band: a dark plate, full-bleed, like the reference */
+.zen-banner{background:var(--plate);color:var(--panel-fg);
+  padding-block:clamp(64px,9vw,104px);padding-inline:calc(50vw - 50%);
+  width:100vw;margin-left:calc(50% - 50vw);margin-block:0;text-align:center}
+.zen-banner h2{color:var(--panel-fg)}
+.zen-banner p{color:rgba(242,240,243,.72)}
+.zen-banner a.cta{position:relative;margin-top:20px}
+.waitlist{border:1px solid var(--line);background:var(--bg2);padding:44px 32px;
+  border-radius:0;margin:36px 0;text-align:center}
+.waitlist form{display:flex;gap:10px;margin:20px auto 0;max-width:520px;flex-wrap:wrap}
+.waitlist input{flex:1;min-width:220px;padding:12px 16px;border:1px solid var(--line-strong);border-radius:0;
+  font-family:inherit;font-size:var(--text-body-sm);background:var(--bg);color:var(--ink)}
+/* :focus (not :focus-visible) tints the edge for mouse users; the global
+   :focus-visible outline supplies the actual keyboard indicator. The previous
+   `outline:none` + 10%-accent box-shadow left keyboard users with a ring of
+   about 1.15:1, well under the 3:1 a focus indicator needs. */
+.waitlist input:focus{border-color:var(--accent)}
+
+/* ---------- sign-in / sign-up ----------
+   One centered card on the page canvas. The console it opens is a separate
+   surface with its own stylesheet — this page only has to look like the front
+   door to it, so it reuses the marketing type scale and the button system
+   rather than the console's tokens. */
+.auth{max-width:440px;margin:clamp(44px,8vw,96px) auto;text-align:left}
+.auth h1{font-size:var(--text-h2);margin:0 0 8px}
+.auth .sub{margin:0 0 28px}
+.authcard{border:1px solid var(--line);background:var(--bg2);padding:28px}
+.authcard form{display:flex;flex-direction:column;margin:0}
+.authcard label{font-family:var(--font-mono);font-size:var(--text-label-sm);letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--muted);margin-top:16px}
+.authcard label:first-child{margin-top:0}
+.authcard input{padding:12px 14px;margin-top:6px;border:1px solid var(--line-strong);border-radius:0;
+  font-family:inherit;font-size:var(--text-body-sm);background:var(--bg);color:var(--ink)}
+.authcard input:focus{border-color:var(--accent)}
+.authcard .btn{width:100%;margin-top:20px}
+/* The sign-in forms look like the real thing, so they have to say what they are
+   before someone types a password into them. */
+.auth-demo{margin:0 0 18px;padding:11px 13px;border:1px solid var(--line-strong);background:var(--bg3);
+  font-size:var(--text-body-xs);color:var(--ink);text-align:left}
+.ghbtn{width:100%}
+.auth-or{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);
+  font-family:var(--font-mono);font-size:var(--text-label-sm);letter-spacing:var(--tracking-label);text-transform:uppercase}
+.auth-or::before,.auth-or::after{content:"";flex:1;height:1px;background:var(--line)}
+.auth-alt{margin:20px 0 0;font-size:var(--text-body-sm);color:var(--muted)}
+.auth-alt a{color:var(--accent)}
+#auth-err{margin:14px 0 0;padding:10px 12px;border:1px solid var(--red);color:var(--red);
+  font-size:var(--text-body-sm)}
+/* an alert that is removed from the accessibility tree between errors is not
+   announced when it appears, so it stays in place and collapses when empty */
+#auth-err:empty{display:none}
+
+/* ---------- footer ---------- */
+footer{border-top:1px solid var(--line);margin-top:0;background:var(--bg)}
+.fcols{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;padding:56px 0 36px;text-align:left}
+.fbrand p{color:var(--muted);font-size:var(--text-body-sm);max-width:280px;line-height:1.55}
+.fbrand .logo{margin-bottom:18px}
+.fcols b{display:block;font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted);margin-bottom:14px}
+.fcols a{display:block;text-decoration:none;font-size:var(--text-body-sm);padding:5px 0;color:var(--ink)}
+.fcols a:hover{color:var(--accent)}
+.fbase{display:flex;gap:16px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);
+  padding:20px 0 28px;color:var(--muted);font-size:var(--text-body-xs)}
+
+/* ---------- docs ---------- */
+/* minmax(0,1fr), not 1fr: a bare 1fr track takes its min-content size, and the
+   doc column's widest <pre> then pushes the grid past the measure and adds a
+   horizontal scrollbar to the page. */
+.docs-layout{display:grid;grid-template-columns:264px minmax(0,1fr);gap:24px;padding:32px 0;align-items:start;text-align:left}
+.sidebar{border:1px solid var(--line);background:var(--bg2);padding:14px;height:fit-content;
+  position:sticky;top:calc(var(--header-h) + 16px);border-radius:0}
+.sidebar b{display:block;padding:6px 10px 12px;font-family:var(--font-mono);font-size:var(--text-label-sm);
+  font-weight:500;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted)}
+.sidebar a{display:block;padding:8px 10px;text-decoration:none;font-size:var(--text-body-sm);border-radius:0;color:var(--muted)}
+.sidebar a:hover{background:var(--tint-hover);color:var(--ink)}
+.sidebar a.active{background:var(--accent);color:var(--accent-strong);font-weight:500}
+.doc{border:1px solid var(--line);background:var(--bg2);padding:40px;border-radius:0;text-align:left}
+.doc h1{font-size:var(--text-h1)}
+.doc h2{font-size:var(--text-h3);margin-top:34px}
+.doc pre{background:var(--panel);color:var(--code-fg);padding:18px;overflow-x:auto;border-radius:0;font-size:var(--text-body-2xs);line-height:1.6}
+
+/* ---------- misc grids ---------- */
+.dl-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;text-align:left;
+  background:var(--line);border:1px solid var(--line)}
+/* .btn shape/size/fill/state are owned by buttons.css. Only the inline-flow
+   margin (.doc / .feat / .dl-grid contexts) stays here. */
+.btn{margin:8px 8px 0 0}
+
+/* ---------- steps (numbered process) ---------- */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:28px;margin-top:34px;text-align:left}
+.step{padding-top:20px;border-top:1px solid var(--line-strong)}
+.step i{display:block;font-family:var(--font-mono);font-style:normal;font-size:var(--text-label);
+  letter-spacing:var(--tracking-label);color:var(--accent);margin-bottom:10px}
+.step b{display:block;font-size:var(--text-card-title);font-weight:500;letter-spacing:-.011em;margin-bottom:6px}
+.step p{margin:0;color:var(--muted);font-size:var(--text-body-sm);line-height:1.55}
+
+/* ---------- enterprise extras ---------- */
+.pillrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:28px}
+.pillrow span{font-family:var(--font-mono);font-size:var(--text-label-sm);letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--muted);border:1px solid var(--line);
+  background:var(--bg2);padding:8px 14px}
+.quotebig{max-width:820px;margin:0 auto 40px;font-size:clamp(1.5rem,1.1rem + 1.6vw,2rem);
+  line-height:1.3;letter-spacing:-.02em;text-wrap:balance;font-weight:500}
+.quotebig span{display:block;margin-top:18px;font-family:var(--font-mono);font-size:var(--text-label-sm);
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted);font-weight:500}
+
+/* ---------- pricing ---------- */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:32px;text-align:left;
+  background:var(--line);border:1px solid var(--line)}
+.plan{position:relative;background:var(--bg2);border:0;border-radius:0;
+  padding:32px 28px;display:flex;flex-direction:column;
+  transition:background var(--t-med) var(--ease)}
+.plan:hover{background:var(--bg3)}
+.plan.wide{grid-column:1/-1}
+.plan h3{margin:0;font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted)}
+.plan .price{margin:22px 0 0;font-family:var(--font-sans);font-size:var(--text-plan-value);font-weight:500;letter-spacing:-.03em;line-height:1.04}
+.plan .price small{font-family:var(--font-sans);font-size:var(--text-body-sm);font-weight:400;color:var(--muted);letter-spacing:0}
+.plan .credits{margin:6px 0 0;font-size:var(--text-body-sm);font-weight:500;color:var(--accent)}
+.plan .tagline{margin:10px 0 0;color:var(--muted);font-size:var(--text-body-sm)}
+.plan .btn{margin-top:22px;text-align:center;align-self:flex-start}
+.plan ul{list-style:none;margin:24px 0 0;padding:24px 0 0;border-top:1px solid var(--line);
+  display:flex;flex-direction:column;gap:11px;font-size:var(--text-body-sm);color:var(--muted)}
+.plan ul li{padding-left:24px;position:relative}
+.plan ul li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:600}
+.plan-flag{position:absolute;top:0;right:28px;background:var(--accent);color:var(--accent-strong);
+  font-family:var(--font-mono);font-size:var(--text-label-xs);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;padding:6px 12px}
+/* the featured plan is the dark card, like the reference's dark pricing tier */
+.plan.featured{background:var(--panel);color:var(--panel-fg)}
+.plan.featured:hover{background:var(--panel)}
+.plan.featured h3{color:rgba(242,240,243,.6)}
+.plan.featured .price{color:var(--panel-fg)}
+.plan.featured .price small,.plan.featured .tagline{color:rgba(242,240,243,.72)}
+.plan.featured .credits{color:var(--code-accent)}
+.plan.featured ul{border-top-color:rgba(242,240,243,.2);color:rgba(242,240,243,.72)}
+.plan.featured ul li::before{color:var(--code-accent)}
+.compare{margin:26px auto 0;border:1px solid var(--line);border-radius:0;
+  overflow-x:auto;background:var(--bg2);max-width:960px;text-align:left}
+.compare table{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);min-width:640px}
+.compare th,.compare td{padding:13px 16px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+.compare thead th{background:var(--bg3);color:var(--muted);font-family:var(--font-mono);
+  font-size:var(--text-label-sm);font-weight:500;letter-spacing:var(--tracking-label);text-transform:uppercase}
+.compare tbody tr:last-child td{border-bottom:0}
+.compare tbody tr:hover{background:var(--tint-hover)}
+.compare td:first-child{color:var(--ink);font-weight:500}
+
+/* ---------- positioning quadrant (pricing) ----------
+   Marketing view of the 2026 landscape: quadrant NAMES only. Per the spec,
+   competitor coordinates are internal-only, so this renders the four cells and
+   highlights where SandCode sits — never a scatter plot of rivals. */
+.quad{margin:38px auto 0;max-width:820px;text-align:left;
+  display:grid;grid-template-columns:auto 1fr;grid-template-rows:1fr auto;gap:12px}
+.quad-y{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center;justify-self:center;
+  font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted)}
+.quad-grid{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+  border:1px solid var(--line);overflow:hidden;background:var(--line);gap:1px}
+.quad-cell{padding:22px 20px;background:var(--bg2);
+  display:flex;flex-direction:column;gap:8px;min-height:156px}
+.quad-cell b{font-size:var(--text-body-sm);font-weight:600;color:var(--ink)}
+.quad-cell p{margin:0;font-size:var(--text-body-xs);color:var(--muted);line-height:1.5}
+.quad-cell .q-tag{font-family:var(--font-mono);font-size:var(--text-label-xs);letter-spacing:var(--tracking-label);
+  text-transform:uppercase;color:var(--accent)}
+.quad-cell.on{background:var(--panel)}
+.quad-cell.on b{color:var(--panel-fg)}
+.quad-cell.on p{color:rgba(242,240,243,.72)}
+.quad-cell.on .q-tag{color:var(--code-accent)}
+.quad-x{grid-column:2;text-align:center;font-family:var(--font-mono);font-size:var(--text-label-sm);
+  font-weight:500;letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--muted)}
+
+@media(max-width:900px){.plans{grid-template-columns:1fr 1fr}}
+/* the marketing nav cannot lay out on one line below ~1000px — collapse it to
+   the disclosure menu there (buttons.css shows .menu-btn at the same width) */
+@media(max-width:1024px){
+  .nav-links{display:none;position:absolute;top:calc(100% + 8px);left:0;right:0;margin:0;
+    background:var(--bg2);border:1px solid var(--line-strong);border-radius:0;
+    padding:8px;flex-direction:column;align-items:stretch;white-space:normal}
+  .nav-links.open{display:flex}
+  .nav-links a{padding:12px}
+  .nav-links a.btn{margin:6px 0 0;text-align:center}
+  /* they are icon/label controls, not rows — don't let the column stretch them */
+  .nav-links .lang, .nav-links .theme-btn{align-self:flex-start;margin-left:0;margin-top:6px}
+}
+@media(max-width:760px){
+  .grid,.stats,.dl-grid{grid-template-columns:minmax(0,1fr)}
+  .docs-layout{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .uc-panel.active{grid-template-columns:minmax(0,1fr)}
+  .plans{grid-template-columns:minmax(0,1fr)}
+  .quad{grid-template-columns:minmax(0,1fr)}
+  .quad-y{writing-mode:horizontal-tb;transform:none;justify-self:start}
+  .quad-grid,.quad-x{grid-column:1}
+  .fcols{grid-template-columns:1fr 1fr}
+  .hero{padding:64px 0 22px}
+  section.block{padding-block:52px}
+  .sidebar{position:static}
+  .doc{padding:24px}
+  .term-body{min-height:330px}
+  .logo-row{flex-wrap:wrap;width:auto;justify-content:center}
+  .logo-row span{margin:0 12px}
+}
+@media(max-width:560px){.fcols{grid-template-columns:1fr}}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none !important;transition:none !important}
+  .reveal{opacity:1 !important;transform:none !important}
+}
+
+/* ---------- dark theme ----------
+   Surfaces re-derive from tokens.css, so only the values that are literal
+   rgba tints of the light canvas need a dark counterpart. */
+
+/* ---------- scroll reveal ---------- */
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- use cases ---------- */
+.uc-tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:30px 0 34px}
+.uc-tabs button.active{background:var(--accent);color:var(--accent-strong);box-shadow:none;border-color:var(--accent)}
+/* minmax(0,…) for the same reason as .docs-layout: the code panel inside
+   carries nowrap lines, and a bare 1fr track would size to their min-content
+   and push the panel wider than the page. */
+.uc-panel{display:none;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:32px;align-items:center;text-align:left;
+  max-width:980px;margin:0 auto}
+.uc-panel.active{display:grid}
+.uc-panel h3{font-family:var(--font-sans);font-weight:500;font-size:var(--text-h3);letter-spacing:-.02em;margin:0 0 12px}
+.uc-term{background:var(--panel);color:var(--code-fg);border-radius:0;padding:24px;
+  font-family:var(--font-mono);font-size:var(--text-body-2xs);line-height:1.7;text-align:left}
+.uc-prompt{color:var(--code-fg);background:rgba(242,240,243,.07);border:1px solid rgba(242,240,243,.14);
+  border-radius:0;padding:11px 14px;margin-bottom:16px;overflow-x:auto;white-space:nowrap}
+.uc-out b{color:var(--code-bright);font-weight:600}
+.uc-term .green{color:var(--code-accent)}

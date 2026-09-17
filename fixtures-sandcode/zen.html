@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SandCode Models | Eight models for coding agents</title>
+<link rel="stylesheet" href="./fonts.css?v=24">
+<link rel="stylesheet" href="./tokens.css?v=24">
+<link rel="stylesheet" href="./style.css?v=24">
+<link rel="stylesheet" href="./buttons.css?v=24">
+<link rel="stylesheet" href="./chrome.css?v=24">
+<link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="./fonts/clash-grotesk-variable.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/geist-mono-latin.woff2" crossorigin>
+<meta name="description" content="Sand Zen — eight handpicked models load-tested on real agent traces, with transparent list pricing and 1:1 prompt-caching passthrough.">
+<meta property="og:title" content="SandCode Models | Eight models for coding agents">
+<meta property="og:description" content="Sand Zen — eight handpicked models load-tested on real agent traces, with transparent list pricing and 1:1 prompt-caching passthrough.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://sandcode.ai/zen.html">
+<meta property="og:url" content="https://sandcode.ai/zen.html">
+<meta property="og:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SandCode — flat-rate coding compute for every agent client">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:site_name" content="SandCode">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<script>try{var t=localStorage.getItem('sandcode-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.body.dataset.theme=t}catch(e){}</script>
+<script>try{var l=(localStorage.getItem('sandcode-lang')||(navigator.languages&&navigator.languages[0])||navigator.language||'en').toLowerCase().split('-')[0],d=document.documentElement;if('en zh ja ko es de fr pt ru'.split(' ').indexOf(l)<0)l='en';window.__sandLang=l;d.lang=l;if(l!=='en'){d.classList.add('i18n-pending');setTimeout(function(){d.classList.remove('i18n-pending')},3000);var p=document.createElement('link');p.rel='preload';p.as='script';p.href='./i18n-'+l+'.js?v=24';document.head.appendChild(p)}}catch(e){}</script>
+<header class="site-header"></header>
+<main id="main" tabindex="-1" class="wrap">
+<div class="hero">
+<div class="badge">SAND ZEN — curated for coding agents</div>
+<h1>Eight models. <em>Zero guesswork.</em></h1>
+<p class="sub">Every model below is load-tested on real agent traces before it earns a place in the pool. Transparent list price, 1:1 prompt-caching passthrough, no hidden markup.</p>
+<div class="hero-ctas"><a class="btn" href="./download.html">Start with Zen</a><a class="btn light" href="./pricing.html">See plans</a></div>
+</div>
+
+<section class="block">
+<div class="eyebrow">The lineup</div>
+<h2>Eight models, <em>one pool.</em></h2>
+<p class="sub">Prices are per million tokens at upstream list rate. Your subscription pool is drawn down at exactly these numbers.</p>
+<div class="compare">
+<table aria-label="Eight models, one pool.">
+<thead><tr><th scope="col">Model</th><th scope="col">Context</th><th scope="col">In / Out</th><th scope="col">Cache reads</th><th scope="col">Quota</th></tr></thead>
+<tbody>
+<tr><td><code>deepseek/deepseek-v4.1-flash</code></td><td>1M</td><td>$0.44 / $1.32</td><td>0.0318×</td><td>Full pool · default</td></tr>
+<tr><td><code>tencent/hy3</code></td><td>256k</td><td>$0.132 / $0.528</td><td>0.2500×</td><td>Full pool · cheapest</td></tr>
+<tr><td><code>minimax/minimax-m3</code></td><td>1M</td><td>$0.30 / $1.20</td><td>0.2000×</td><td>Full pool · multimodal</td></tr>
+<tr><td><code>xiaomi/mimo-v2.5</code></td><td>1M</td><td>$0.40 / $2.00</td><td>0.2000×</td><td>Full pool · omni-modal</td></tr>
+<tr><td><code>deepseek/deepseek-v4.1-pro</code></td><td>1M</td><td>$1.32 / $3.96</td><td>0.0333×</td><td>$20/mo sub-quota</td></tr>
+<tr><td><code>z-ai/glm-5.2</code></td><td>1M</td><td>$1.40 / $4.40</td><td>0.2000×</td><td>$20/mo sub-quota</td></tr>
+<tr><td><code>tencent/hy3-preview</code></td><td>256k</td><td>$0.066 / $0.26</td><td>0.4394×</td><td>Survival tier · 3 RPM</td></tr>
+<tr><td><code>anthropic/claude-sonnet-5</code></td><td>1M</td><td>$2.00 / $10.00</td><td>0.1000×</td><td>PAYG / BYOK passthrough</td></tr>
+</tbody>
+</table>
+</div>
+<p class="sub" style="font-size:12.5px;margin-top:14px">The two flagship reasoning models draw on a separate monthly sub-quota to keep long-thinking arbitrage from eating the shared pool. Pro raises the pool to $175, the sub-quota to $50 and tool calls to 2,500 — the lineup and cache rates are identical on both plans.</p>
+</section>
+
+<section class="block">
+<div class="eyebrow">Caching</div>
+<h2>Cache reads, <em>passed through 1:1.</em></h2>
+<p class="sub">On the flagship model, a cache read costs 0.0318× the input price — about $0.0140 per million tokens. We pass that discount through untouched.</p>
+<div class="compare">
+<table aria-label="Cache reads, passed through 1:1.">
+<thead><tr><th scope="col">Scenario</th><th scope="col">Working</th><th scope="col">Cost</th></tr></thead>
+<tbody>
+<tr><td>No cache</td><td>50,000 × $0.44/M + 3,400 × $1.32/M</td><td>$0.0265</td></tr>
+<tr><td>Cache hit at 80%</td><td>10,000 × $0.44/M + 40,000 × $0.0140/M + 3,400 × $1.32/M</td><td>$0.0094</td></tr>
+<tr><td>Effective purchasing power</td><td>$0.0265 ÷ $0.0094</td><td>≈ 2.8×</td></tr>
+</tbody>
+</table>
+</div>
+<div class="grid">
+<div class="card"><b>What it does not do</b><p>Caching does not raise our margin — the platform takes the same cut either way. It changes how much work one dollar of quota buys, which is why a $70 pool buys around $196 of list-price work.</p></div>
+<div class="card"><b>Measured, not assumed</b><p>The 2.8× figure is quoted at an 80% cache hit rate with the output around 7% of the input tokens. We quote the conservative end — heavier input means a bigger multiple.</p></div>
+</div>
+</section>
+
+<section class="block">
+<div class="eyebrow">Tools</div>
+<h2>Give the agent <em>eyes.</em></h2>
+<p class="sub">Models hallucinate on anything newer than their training cut-off. Search and scrape are injected as MCP tools so the agent can look things up mid-task.</p>
+<div class="grid">
+<div class="card"><b>Search</b><p>Two providers behind one tool. It prioritises Stack Overflow, GitHub Discussions, MDN and official docs, with 500 calls per month on Standard.</p></div>
+<div class="card"><b>Scrape</b><p>Renders JavaScript pages and cleans them into Markdown the model can actually read — 500 calls per month on Standard.</p></div>
+<div class="card"><b>GitHub connector</b><p>Pulls issues, reads pull-request diffs and commits suggestions. It does not draw on the 1,000-call tool quota.</p></div>
+<div class="card"><b>Rate limits</b><p>30 tool calls per minute with at most 2 in flight. Beyond the included quota, calls are billed at $0.02 each.</p></div>
+</div>
+</section>
+
+<section class="block band band-mint">
+<div class="eyebrow">Method</div>
+<h2>How a model <em>earns its badge.</em></h2>
+<div class="grid">
+<div class="card"><b>Continuous evaluation</b><p>SWE-bench and HumanEval runs on the same hardware every day, scored on real agent traces rather than chat prompts.</p></div>
+<div class="card"><b>Tool-calling repair</b><p>Malformed JSON arguments and dropped thinking tags are repaired at the gateway, so a weak model still behaves like a stable one.</p></div>
+<div class="card"><b>Provider tuning</b><p>Delivery is pinned and versioned per model-provider pair, then monitored for regressions before it reaches the pool.</p></div>
+</div>
+<div class="stats">
+<div class="stat"><strong>8</strong>Models in the pool</div>
+<div class="stat"><strong>0.3%</strong>Transpiler error budget</div>
+<div class="stat"><strong>3+</strong>Upstream clouds</div>
+</div>
+</section>
+
+<section class="block">
+<div class="eyebrow">Process</div>
+<h2>How it <em>works.</em></h2>
+<div class="steps">
+<div class="step"><i>01</i><b>Install and run setup</b><p>One command writes the endpoint and MCP tools into every client you use.</p></div>
+<div class="step"><i>02</i><b>Pick a plan</b><p>Standard or Pro. The pool covers the full lineup with caching passed through 1:1.</p></div>
+<div class="step"><i>03</i><b>Keep moving</b><p>The 6h window, daily burst and PAYG overflow keep long agent runs from stalling.</p></div>
+</div></section>
+
+<section class="block"><h2>Trained on <em>nothing</em> of yours.</h2>
+<p class="sub">Requests are never used for training. Prompt content is not stored by default, and anything you opt into is redacted and deleted after 7 days. <a href="./enterprise.html">Enterprise options →</a></p></section>
+
+<section class="block">
+<div class="eyebrow">FAQ</div>
+<h2>Questions, <em>answered.</em></h2>
+<div class="faq">
+<details open><summary>What is Sand Zen?</summary><p>A curated pool of eight models, load-tested for coding agents, at transparent list price with 1:1 cache passthrough. No mystery routing, no hidden multipliers.</p></details>
+<details><summary>How is the model list chosen?</summary><p>Models are scored on agentic coding tasks specifically — tool calls, multi-file edits, long context — not on chat benchmarks. Eight models is deliberate: a small pool can be tuned and monitored, twenty cannot.</p></details>
+<details><summary>What does the cache read price mean?</summary><p>If a cached prefix is reused, those tokens bill at 0.0318× input on the flagship — about $0.0140 per million. The discount is passed through in full, never absorbed.</p></details>
+<details><summary>Do search and scrape cost extra?</summary><p>500 search and 500 scrape calls are included every month on Standard, and 2,500 combined on Pro. Beyond that they are billed at $0.02 each.</p></details>
+<details><summary>Can I use these models with other agents?</summary><p>Yes. The gateway speaks both the OpenAI and Anthropic wire formats, so any client that accepts a custom base URL can use the pool.</p></details>
+</div>
+</section>
+
+<div class="zen-banner">
+<h2 style="margin:0">Put the pool behind a plan.</h2>
+<p>Standard is $9.9/mo for a $70 pool, bundled tools and the local harness.</p>
+<a class="cta" href="./pricing.html">See plans →</a>
+</div>
+</main>
+<footer></footer>
+<script src="./chrome.js?v=24"></script>
+<script src="./i18n.js?v=24"></script>
+<script src="./common.js?v=24"></script>
+<script src="./script.js?v=24"></script></body></html>

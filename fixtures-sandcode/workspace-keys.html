@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en" class="auth-locked"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SandCode Console — API keys</title>
+<link rel="stylesheet" href="./fonts.css?v=24">
+<link rel="stylesheet" href="./tokens.css?v=24">
+<link rel="stylesheet" href="./workspace.css?v=24">
+<link rel="stylesheet" href="./buttons.css?v=24">
+<link rel="stylesheet" href="./chrome.css?v=24">
+<link rel="icon" type="image/svg+xml" href="./assets/favicon.svg">
+<link rel="preload" as="font" type="font/woff2" href="./fonts/clash-grotesk-variable.woff2" crossorigin>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/geist-mono-latin.woff2" crossorigin>
+<meta name="description" content="SandCode Console API keys — create, copy, rotate, and revoke revocable tokens (mock demo).">
+<meta property="og:title" content="SandCode Console — API keys">
+<meta property="og:description" content="SandCode Console API keys — create, copy, rotate, and revoke revocable tokens (mock demo).">
+<meta property="og:type" content="website">
+<meta name="robots" content="noindex">
+<link rel="canonical" href="https://sandcode.ai/workspace-keys.html">
+<meta property="og:url" content="https://sandcode.ai/workspace-keys.html">
+<meta property="og:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="SandCode — flat-rate coding compute for every agent client">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://sandcode.ai/assets/og.png">
+<meta property="og:site_name" content="SandCode">
+<style>html.auth-locked body{visibility:hidden}html.auth-locked .auth-nojs{visibility:visible}</style>
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+<noscript><div class="auth-nojs"><h1>Sign-in needs JavaScript</h1><p>The console keeps your session in this browser, so it cannot open without scripts. Turn JavaScript on and reload this page.</p></div></noscript>
+<script>try{var t=localStorage.getItem('sandcode-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');document.body.dataset.theme=t}catch(e){}</script>
+<script>try{if(localStorage.getItem('sandcode-auth'))document.documentElement.classList.remove('auth-locked');else location.replace('./signin.html')}catch(e){location.replace('./signin.html')}</script>
+<script>try{var l=(localStorage.getItem('sandcode-lang')||(navigator.languages&&navigator.languages[0])||navigator.language||'en').toLowerCase().split('-')[0],d=document.documentElement;if('en zh ja ko es de fr pt ru'.split(' ').indexOf(l)<0)l='en';window.__sandLang=l;d.lang=l;if(l!=='en'){d.classList.add('i18n-pending');setTimeout(function(){d.classList.remove('i18n-pending')},3000);var p=document.createElement('link');p.rel='preload';p.as='script';p.href='./i18n-'+l+'.js?v=24';document.head.appendChild(p)}}catch(e){}</script>
+<div id="app">
+  <aside id="side"></aside>
+  <div id="side-scrim" hidden></div>
+  <main id="main" tabindex="-1" class="main">
+    <header id="topbar"></header>
+    <div class="ws-page"><div class="ws-inner">
+      <h1>API keys</h1>
+      <p class="ws-sub">Keys inherit the workspace pool · mock data, values are fake.</p>
+      <div class="ws-card" style="margin-bottom:14px">
+        <table aria-label="API keys" class="utable" id="keys-table"><thead><tr><th scope="col">Name</th><th scope="col">Key</th><th scope="col">Last used</th><th scope="col"><span class="sr-only">Actions</span></th></tr></thead>
+        <tbody>
+          <tr><td>CI runner</td><td class="mono">sb_live_••••ab12</td><td>2h ago</td>
+            <td class="num"><button class="wbtn ghost" data-copy="sb_live_mock_ab12_key" type="button">Copy</button>
+            <button class="wbtn ghost" data-regen type="button">Rotate</button>
+            <button class="wbtn danger" data-revoke type="button">Revoke</button></td></tr>
+          <tr><td>Laptop</td><td class="mono">sb_live_••••9f04</td><td>Yesterday</td>
+            <td class="num"><button class="wbtn ghost" data-copy="sb_live_mock_9f04_key" type="button">Copy</button>
+            <button class="wbtn ghost" data-regen type="button">Rotate</button>
+            <button class="wbtn danger" data-revoke type="button">Revoke</button></td></tr>
+        </tbody></table>
+        <div class="btnrow"><button class="wbtn" id="key-create" type="button">Create key</button></div>
+      </div>
+      <div class="ws-card"><h2>How keys are bound</h2>
+        <ul class="check"><li>Each key is tied to your account, a device fingerprint and the 5-request concurrency limit</li>
+        <li>Rotate a key from the CLI, or revoke it here instantly</li>
+        <li>Usage from an unusual region or too many devices triggers re-verification</li>
+        <li>Config written by setup uses short-lived tokens, never a long-lived secret</li></ul>
+      </div>
+    </div></div>
+  </main>
+</div>
+<div id="toast" role="status" aria-live="polite" hidden></div>
+<script src="./chrome.js?v=24"></script>
+<script src="./i18n.js?v=24"></script>
+<script src="./common.js?v=24"></script>
+<script src="./workspace-pages.js?v=24"></script>
+</body></html>

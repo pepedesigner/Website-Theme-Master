@@ -1,0 +1,110 @@
+/* Sandcode button system — ONE spec for every button.
+   Shape, size, type and motion are identical everywhere; only the fill
+   changes per context (marketing = inverted ink, console = inverted ink too)
+   via --btn-bg/--btn-fg. Roles: primary (default) / ghost / danger / small /
+   icon. Deliberately outside this spec: segmented tabs (.tabs), toggle
+   switches, list rows, plain text links.
+   This file loads last and owns shape/size/type/state for the selectors below;
+   style.css and workspace.css must not redeclare those properties. */
+
+/* ---------- base: every button shares this ---------- */
+.btn, .wbtn, .copy,
+.nav-links a.btn, .menu-btn, #menu-side, .theme-btn, #toTop,
+.waitlist button, .uc-tabs button, .zen-banner a.cta,
+.d-share button {
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:0 18px 0 20px;border-radius:var(--radius-button);
+  font-family:var(--font-sans);font-size:var(--text-body-sm);font-weight:500;letter-spacing:.01em;line-height:1.2;
+  border:1px solid transparent;cursor:pointer;text-decoration:none;white-space:nowrap;
+  box-shadow:none;
+  transition:background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),transform var(--t-fast) var(--ease);
+}
+.btn:active, .wbtn:active, .copy:active,
+.nav-links a.btn:active, .menu-btn:active, #menu-side:active, .theme-btn:active, #toTop:active,
+.waitlist button:active, .uc-tabs button:active, .zen-banner a.cta:active,
+.d-share button:active { transform:scale(.98); }
+.btn:disabled, .wbtn:disabled,
+.waitlist button:disabled, .uc-tabs button:disabled { opacity:.45;cursor:not-allowed;transform:none; }
+
+/* ---------- primary (context fill) ---------- */
+.btn:not(.light),
+.wbtn:not(.ghost):not(.danger),
+.nav-links a.btn, .menu-btn, #menu-side,
+.waitlist button, .zen-banner a.cta {
+  background-color:var(--btn-bg);border-color:var(--btn-bg);color:var(--btn-fg);
+}
+/* the signature interaction: the ink fill flips to the highlight on hover */
+.btn:not(.light):hover,
+.wbtn:not(.ghost):not(.danger):hover,
+.nav-links a.btn:hover, .menu-btn:hover, #menu-side:hover,
+.waitlist button:hover, .zen-banner a.cta:hover {
+  background-color:var(--mark-bg);border-color:var(--mark-bg);color:var(--mark-fg);
+}
+
+/* ---------- ghost ---------- */
+.btn.light, .wbtn.ghost, .uc-tabs button,
+.copy, .d-share button,
+.theme-btn, #toTop {
+  background-color:var(--bg2);border-color:transparent;color:var(--ink);
+  box-shadow:inset 0 0 0 1px var(--line-strong);
+}
+.btn.light:hover, .wbtn.ghost:hover, .uc-tabs button:hover,
+.copy:hover, .d-share button:hover,
+.theme-btn:hover, #toTop:hover {
+  background-color:var(--accent);color:var(--accent-strong);box-shadow:none;
+}
+
+/* ---------- danger ---------- */
+.wbtn.danger {
+  background-color:transparent;border-color:var(--red);color:var(--red);
+}
+.wbtn.danger:hover { background-color:var(--red);border-color:var(--red);color:var(--bg2); }
+
+/* ---------- small ---------- */
+.copy, .d-share button { min-height:34px;padding:0 12px;font-size:var(--text-body-2xs); }
+
+/* ---------- icon (square, not round) ---------- */
+.theme-btn, #menu-side { width:40px;height:40px;min-height:0;padding:0; }
+/* In the marketing nav the toggle sits between the language picker and the
+   Install CTA, so all three share one height — 44, which is what the base button
+   already is and what #toTop below already uses. The console topbar keeps the
+   40: that row *is* --header-h (16px padding, a control either side), so growing
+   its controls would grow the header. */
+.nav-links .theme-btn { width:44px;height:44px; }
+/* #toTop is created hidden and revealed with .show — it owns the fade as well,
+   otherwise the base transition would override it and the button would pop in. */
+#toTop { width:44px;height:44px;min-height:0;padding:0;font-size:17px;
+  transition:opacity .25s var(--ease),transform .25s var(--ease),background-color var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),color var(--t-fast) var(--ease); }
+
+/* ---------- context fills ---------- */
+/* marketing: an inverted ink button (the one dark element on a light canvas) */
+body { --btn-bg:var(--ink); --btn-fg:var(--bg); }
+/* the toggle sets data-theme too — mirror the default so it is stable */
+body[data-theme="dark"] { --btn-bg:var(--ink); --btn-fg:var(--bg); }
+body[data-theme="light"] { --btn-bg:var(--ink); --btn-fg:var(--bg); }
+
+/* ---------- documented exceptions (must stay distinct) ---------- */
+/* The marketing nav needs ~1000px to lay out on one line (logo + 7 links +
+   locale + theme + CTA), so it collapses below that — the same place the
+   reference does. The console drawer button is tied to the console's own
+   sidebar breakpoint instead, so the two cannot drift apart. */
+.menu-btn, #menu-side { display:none; }
+@media(max-width:1024px) {
+  .menu-btn { display:inline-flex; }
+}
+@media(max-width:760px) {
+  #menu-side { display:inline-flex; }
+}
+/* the menu button is a text control, not a filled action */
+.menu-btn { background-color:transparent;border-color:transparent;color:var(--ink);
+  font-family:var(--font-mono);font-size:var(--text-label-sm);letter-spacing:var(--tracking-label);text-transform:uppercase;padding:0 10px; }
+.menu-btn:hover { background-color:var(--tint-hover);border-color:transparent;color:var(--ink); }
+
+/* on a dark plate the CTA takes the highlight fill, like the reference's
+   closing band — lime on dark in light mode, violet on dark in dark mode */
+.zen-banner a.cta, .plan.featured .btn {
+  background-color:var(--mark-bg);border-color:var(--mark-bg);color:var(--mark-fg);
+}
+.zen-banner a.cta:hover, .plan.featured .btn:hover {
+  background-color:var(--bg2);border-color:var(--bg2);color:var(--ink);
+}

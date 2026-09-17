@@ -1,0 +1,317 @@
+/* Sandcode Console — SandBase-aligned app theme (mock, no backend).
+   Light-first like the marketing site; every surface alias below re-derives
+   from tokens.css so one switch drives both. Button shape/size/type/state come
+   from buttons.css (loaded last); the rules here only add console-specific
+   fills, layout and the sub-page components. */
+:root{
+  /* shared type/shape/motion come from tokens.css:
+     --font-sans, --font-mono, --radius-button, --pill,
+     --shadow-pop, --ease, --t-fast, --t-med */
+
+  /* Every meter in the console is drawn as discrete cells rather than a smooth
+     fill, so the grid itself is the unit of measure — a window reads as "how
+     many cells are lit" instead of a vague length of colour. `--pitch` is the
+     cell plus its gap; both the track and the fill tile on it and anchor to the
+     same edge, so a filled cell always sits exactly over an empty one. */
+  --cell:6px;
+  --pitch:9px;
+  /* The daily columns use a coarser pitch: they are a chart, so the block has to
+     read as a block, and 10 whole cells is a legible scale. The column height is
+     an exact multiple of --pitch-v, so the top cell is never a sliver. */
+  --cell-v:9px;
+  --pitch-v:13px;
+}
+*{box-sizing:border-box}
+/* the inline bootstrap adds this class when 中文 is the stored language, so the
+   page never paints English first; i18n.js removes it once the dictionary has
+   been applied (the bootstrap also clears it after 2s as a safety net) */
+html.i18n-pending body{visibility:hidden}
+html{scrollbar-gutter:stable;overflow-x:clip}
+html,body{height:100%}
+body{margin:0;background:var(--abg);color:var(--afg);
+  font-family:var(--font-sans);
+  font-size:var(--text-body-sm);line-height:1.5;overflow:hidden;
+  overflow-wrap:break-word; /* long German/Russian compounds, as in style.css */
+  /* App surfaces alias the tokens instead of repeating literals, so one
+     derivation drives both the marketing site and the console. They sit on
+     body rather than :root because a custom property resolves against the
+     element it is declared on — on :root these would freeze to the light
+     values and the dark theme would never reach them. */
+  --abg:var(--bg); --apanel:var(--bg2); --apanel2:var(--bg3);
+  --aline:var(--line); --afg:var(--ink); --amut:var(--muted);
+  --ahover:rgba(14,11,26,.05); --aline-soft:rgba(14,11,26,.06); --adim:var(--muted)}
+body[data-theme="dark"]{
+  --ahover:rgba(242,240,243,.06); --aline-soft:rgba(242,240,243,.07);
+  --adim:rgba(242,240,243,.68)}
+#app{position:relative;z-index:var(--z-app)}
+button{font:inherit;color:inherit}
+#app{display:flex;height:100vh;height:100dvh}
+/* mono micro-label — one spec, borrowed from the marketing site */
+.ws-nav span,.env-pill,.model-badge,.crumbs,.ws-card h2,.utable th,.wlabel{
+  font-family:var(--font-mono);font-size:var(--text-label-sm);font-weight:500;
+  letter-spacing:var(--tracking-label);text-transform:uppercase}
+
+/* ---------- sidebar ---------- */
+#side{width:288px;flex:none;background:var(--apanel);border-right:1px solid var(--aline);
+  display:flex;flex-direction:column;z-index:var(--z-side)}
+.side-top{display:flex;align-items:center;gap:10px;padding:20px 18px 14px}
+/* the reference wordmark: a plain grotesk logotype, no chip */
+.mini-logo{font-weight:550;letter-spacing:-.018em;font-size:var(--text-lede);text-decoration:none;
+  border:0;padding:0;border-radius:0;background:transparent;color:var(--afg)}
+.mini-logo span{color:var(--afg)}
+.mini-logo i{font-style:normal;color:var(--accent)}
+.env-pill{margin-left:auto;font-size:var(--text-label-xs);color:var(--amut);border:0;
+  padding:0;border-radius:0;display:flex;align-items:center;gap:6px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--positive);flex:none}
+@keyframes pulse{50%{opacity:.45}}
+.side-foot{border-top:1px solid var(--aline);padding:14px 18px 18px;position:relative;margin-top:auto}
+.back-site{display:block;margin-top:2px;font-size:var(--text-body-sm);color:var(--amut);text-decoration:none;padding:6px 0}
+.back-site:hover{color:var(--accent)}
+
+/* ---------- main ---------- */
+.main{flex:1;min-width:0;display:flex;flex-direction:column;background:var(--abg)}
+#topbar{display:flex;align-items:center;gap:14px;padding:16px 22px;border-bottom:1px solid var(--aline);
+  min-height:var(--header-h);background:var(--chrome-bg);backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);flex:none}
+/* fill only — buttons.css owns size/shape/display of #menu-side */
+#menu-side{background:var(--apanel2);border-color:transparent;color:var(--afg)}
+.crumbs{font-weight:500;color:var(--amut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumbs .sep{margin:0 8px;color:var(--amut)}
+#crumb-sess{color:var(--accent)}
+.top-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:none}
+.model-badge{font-size:var(--text-label-xs);font-weight:500;color:var(--accent);border:1px solid var(--aline);
+  background:transparent;padding:6px 10px;border-radius:0;white-space:nowrap}
+.avatar{width:30px;height:30px;border-radius:50%;background:var(--accent);
+  display:grid;place-items:center;font-family:var(--font-mono);font-size:var(--text-label-sm);
+  font-weight:500;color:var(--accent-strong);flex:none}
+
+@media(max-width:760px){
+  #side{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .22s var(--ease);background:var(--apanel);border-right:1px solid var(--aline)}
+  #side.open{transform:none}
+  #side-scrim{display:block;position:fixed;inset:0;background:rgba(14,11,26,.5);z-index:var(--z-scrim)}
+  #side-scrim[hidden]{display:none}
+  .ws-grid{grid-template-columns:1fr}
+  .ws-page{padding:22px 16px 50px}
+}
+#side-scrim{display:none}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+}
+
+/* ---------- console sub-pages ---------- */
+.ws-nav{padding:4px 18px 12px;display:flex;flex-direction:column;gap:2px}
+.ws-nav span{color:var(--amut);padding:6px 9px 4px}
+.ws-nav a{display:flex;align-items:center;gap:9px;text-decoration:none;font-size:var(--text-body-sm);font-weight:500;
+  color:var(--amut);padding:8px 9px;border-radius:0}
+.ws-nav a:hover{background:var(--ahover);color:var(--afg)}
+/* ink label + accent marker, matching the reference console's aria-current
+   treatment — accent as the label itself was only 4.08:1 on --apanel2 */
+.ws-nav a.active{background:var(--apanel2);color:var(--afg)}
+.ws-nav a.active::before{content:"";width:5px;height:5px;background:var(--accent);flex:none}
+.ws-page{flex:1;min-width:0;overflow-y:auto;scrollbar-gutter:stable;padding:32px 32px 64px}
+.ws-inner{max-width:1000px;margin:0 auto;width:100%}
+.ws-page h1{margin:0;font-family:var(--font-display);font-weight:500;font-size:var(--text-h1);
+  letter-spacing:-.02em;line-height:1.1}
+.ws-sub{color:var(--amut);font-size:var(--text-body-sm);margin:10px 0 26px}
+/* tiles share hairlines instead of floating on shadows */
+.ws-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:1px;
+  background:var(--aline);border:1px solid var(--aline)}
+.ws-grid > .ws-card{border:0}
+.ws-card{background:var(--apanel);overflow-x:auto;
+  border:1px solid var(--aline);border-radius:0;
+  padding:24px;box-shadow:none;
+  display:flex;flex-direction:column}
+.ws-card + .ws-card,.ws-card + .ws-grid,.ws-grid + .ws-card{margin-top:1px}
+.ws-card h2{margin:0 0 6px;color:var(--amut)}
+.ws-card p{margin:0;color:var(--amut);font-size:var(--text-body-sm)}
+/* bold inside a card paragraph is the number that matters — without this it stays
+   the muted body colour and the emphasis is weight-only, which reads as nothing */
+.ws-card p b{color:var(--afg)}
+/* the small explainer under a card's content. `.ws-card p` out-specifies a bare
+   `.ws-note`, so the card variant is named explicitly rather than relying on order. */
+.ws-note,.ws-card p.ws-note{margin-top:10px;font-size:var(--text-caption);color:var(--adim)}
+/* mono, like the reference's plan-value — sized to the longest value this
+   console actually shows ('Standard · $9.9/mo'), not the biggest number */
+.ws-card .big{font-family:var(--font-mono);font-weight:500;font-size:clamp(1.75rem,1.4rem + 1.1vw,2.25rem);
+  letter-spacing:-.03em;line-height:1.1;margin:14px 0 4px;color:var(--afg)}
+/* ---------- segmented meters ---------- */
+/* A tiled gradient rather than N elements: the markup keeps its plain
+   `style="width:32%"` and still renders as cells at any width. Anchoring both
+   layers to `left` is what keeps the fill's cells registered with the track's —
+   without it a 32% fill can land mid-cell against the empty ones. */
+.ubar{
+  height:12px;margin:16px 0 9px;
+  background-image:linear-gradient(90deg,var(--tint-track) 0 var(--cell),transparent var(--cell) var(--pitch));
+  background-size:var(--pitch) 100%;
+  background-repeat:repeat-x;
+  background-position:left center;
+}
+.ubar i{
+  display:block;height:100%;
+  background-image:linear-gradient(90deg,var(--accent) 0 var(--cell),transparent var(--cell) var(--pitch));
+  background-size:var(--pitch) 100%;
+  background-repeat:repeat-x;
+  background-position:left center;
+}
+.urow{display:flex;justify-content:space-between;gap:16px;font-family:var(--font-mono);
+  font-size:var(--text-label-xs);letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--adim)}
+.utable{width:100%;border-collapse:collapse;font-size:var(--text-body-sm);margin-top:8px}
+.utable th,.utable td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--aline-soft);white-space:nowrap;vertical-align:middle}
+.utable th{color:var(--amut)}
+.utable tbody tr{transition:background .13s var(--ease)}
+.utable tbody tr:hover{background:var(--tint-hover)}
+.utable tr:last-child td{border-bottom:0}
+.utable td.num,.utable th.num{text-align:right;font-variant-numeric:tabular-nums}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:auto;padding-top:18px}
+/* .wbtn shape/size/type/state live in buttons.css; the ghost hover wash is
+   workspace-specific */
+.winput,.wselect{background-color:var(--bg);border:1px solid var(--aline);border-radius:0;color:var(--afg);
+  padding:11px 13px;font-size:var(--text-body-sm);font-family:inherit;width:100%}
+/* The platform arrow is the one glyph in the console we do not draw, and it sits
+   wherever the platform puts it — a different chevron from the one the language
+   picker draws, and not aligned to the value it belongs to. Suppressed and
+   redrawn as the same filled triangle .lang-caret uses, in currentColor so it
+   follows both themes without a second asset. background-color stays separate
+   from the image so the control keeps its fill. */
+.wselect{
+  -webkit-appearance:none;appearance:none;padding-right:38px;
+  background-image:linear-gradient(45deg,transparent 50%,currentColor 50%),
+                   linear-gradient(135deg,currentColor 50%,transparent 50%);
+  background-position:calc(100% - 21px) 50%,calc(100% - 16px) 50%;
+  background-size:5px 5px,5px 5px;background-repeat:no-repeat;
+}
+.winput:focus,.wselect:focus{outline:none;border-color:var(--accent)}
+.winput:focus-visible,.wselect:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+/* console pages do not load style.css, so the shared focus ring lives here too */
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px;border-radius:0}
+.wlabel{color:var(--amut);margin:16px 0 8px}
+.switchrow{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--aline-soft);font-size:var(--text-body-sm)}
+.switchrow:last-child{border-bottom:0}
+.switchrow small{display:block;color:var(--adim);font-size:var(--text-body-xs)}
+.switch{margin-left:auto;position:relative;width:40px;height:22px;flex:none;cursor:pointer}
+/* the input stays full-size and transparent so it remains focusable and the
+   focus ring has real area — a 0x0 input has no visible focus indicator */
+.switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.switch em{position:absolute;inset:0;background:var(--tint-track);border-radius:var(--pill);transition:background .18s var(--ease)}
+.switch em::after{content:"";position:absolute;left:3px;top:3px;width:16px;height:16px;border-radius:50%;background:var(--bg2);box-shadow:inset 0 0 0 1px var(--line-strong);transition:transform .18s var(--ease)}
+.switch input:checked + em{background:var(--accent)}
+.switch input:checked + em::after{transform:translateX(18px)}
+.switch input:focus-visible + em{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--font-mono);font-size:var(--text-caption)}
+/* Daily columns: a full-height track of empty cells with the lit ones stacked
+   from the bottom. script.js quantises each value to a whole number of cells,
+   so a column never ends mid-cell — the chart steps rather than slides. */
+.dbars{display:flex;gap:8px;align-items:stretch;height:130px;margin-top:18px}
+.dcol{
+  flex:1;position:relative;
+  background-image:linear-gradient(0deg,var(--tint-track) 0 var(--cell-v),transparent var(--cell-v) var(--pitch-v));
+  background-size:100% var(--pitch-v);
+  background-repeat:repeat-y;
+  background-position:bottom center;
+}
+.dcol i{
+  position:absolute;left:0;right:0;bottom:0;display:block;
+  background-image:linear-gradient(0deg,var(--accent) 0 var(--cell-v),transparent var(--cell-v) var(--pitch-v));
+  background-size:100% var(--pitch-v);
+  background-repeat:repeat-y;
+  background-position:bottom center;
+}
+
+/* Inline cell bar for a share in a table — same grid at a smaller pitch, so a
+   table of percentages stops being a column of bare numbers. */
+.share{
+  display:inline-block;width:60px;height:8px;margin-right:10px;vertical-align:middle;
+  background-image:linear-gradient(90deg,var(--tint-track) 0 4px,transparent 4px 6px);
+  background-size:6px 100%;
+  background-repeat:repeat-x;
+  background-position:left center;
+}
+.share i{
+  display:block;height:100%;
+  background-image:linear-gradient(90deg,var(--accent) 0 4px,transparent 4px 6px);
+  background-size:6px 100%;
+  background-repeat:repeat-x;
+  background-position:left center;
+}
+.check{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:10px;
+  font-size:var(--text-body-sm);color:var(--amut)}
+.check li{list-style:none;padding-left:22px;position:relative}
+.check li::before{content:"✓";position:absolute;left:0;color:var(--accent);font-weight:600}
+
+/* ---------- referral share row (members) ---------- */
+.d-share{display:flex;gap:8px;align-items:center}
+.d-share code{flex:1;min-width:0;font-family:var(--font-mono);font-size:var(--text-label-sm);color:var(--panel-fg);
+  background:var(--panel);padding:9px 10px;border-radius:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.d-share button{flex:none}
+
+/* ---------- toast + theme btn ---------- */
+/* fill only — buttons.css owns size/shape of #theme-btn */
+#theme-btn{background:var(--apanel2);border-color:transparent;color:var(--afg);flex:none}
+#theme-btn:hover{background:var(--accent);color:var(--accent-strong)}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--panel);
+  border:1px solid var(--aline);color:var(--panel-fg);font-size:var(--text-body-sm);padding:12px 20px;border-radius:0;
+  box-shadow:var(--shadow-pop);z-index:var(--z-toast)}
+#toast[hidden]{display:none}
+
+/* ---------- dark theme ----------
+   Surfaces come from tokens.css, so only values that are literal rgba tints of
+   the light canvas need a dark counterpart — and those live on `body` above. */
+body[data-theme="dark"] #side-scrim{background:rgba(0,0,0,.6)}
+
+/* ---------- auth gate ----------
+   The two rules that hide a locked console are inline in the <head> of every
+   console page, not here. The gate has to hold even when this stylesheet does
+   not load, so it cannot depend on it — with the rules only here, a blocked or
+   offline workspace.css left the console fully visible. What remains below is
+   the styling of the no-JS notice, which only ever shows inside a hidden body. */
+.auth-nojs{position:relative;z-index:var(--z-toast);max-width:520px;margin:18vh auto 0;padding:0 22px;
+  font-family:var(--font-sans);color:var(--afg)}
+.auth-nojs h1{margin:0 0 10px;font-size:var(--text-h2)}
+.auth-nojs p{margin:0;color:var(--amut);font-size:var(--text-body-sm)}
+
+/* ---------- account menu ---------- */
+/* The top bar gets its own layer so the dropdown is not painted under the page
+   cards that follow it. 20 sits above content but below the mobile drawer
+   (--z-side), so an open drawer still covers the bar it was opened from. */
+#topbar{position:relative;z-index:var(--z-topbar)}
+.acct{position:relative;flex:none}
+/* .avatar doubles as a button here — buttons.css does not own this selector, so
+   the resets have to be explicit */
+button.avatar{padding:0;border:0;cursor:pointer;font-family:var(--font-mono)}
+button.avatar:hover{background:var(--mark-bg);color:var(--mark-fg)}
+.acct-menu{position:absolute;top:calc(100% + 10px);right:0;min-width:236px;background:var(--apanel);
+  border:1px solid var(--aline);border-radius:0;padding:6px;box-shadow:var(--shadow-pop);z-index:var(--z-menu)}
+.acct-menu[hidden]{display:none}
+.acct-head{padding:10px 12px 12px;display:flex;flex-direction:column;gap:3px}
+.acct-head b{font-size:var(--text-body-sm);color:var(--afg);font-weight:500}
+.acct-head span{font-family:var(--font-mono);font-size:var(--text-label-xs);color:var(--amut)}
+.acct-sep{height:1px;background:var(--aline);margin:6px 0}
+.acct-menu button{display:block;width:100%;text-align:left;background:transparent;border:0;border-radius:0;
+  padding:10px 12px;font-family:var(--font-sans);font-size:var(--text-body-sm);color:var(--afg);
+  cursor:pointer;position:relative}
+.acct-menu button:hover{background:var(--tint-hover)}
+.acct-menu [data-signout]{color:var(--red)}
+
+/* ---------- modal dialogs ----------
+   Native <dialog>, so focus trapping, Escape and the inert background are the
+   platform's job rather than ours. */
+.ws-dialog{width:min(470px,calc(100vw - 32px));background:var(--apanel);color:var(--afg);
+  border:1px solid var(--aline);border-radius:0;padding:26px;box-shadow:var(--shadow-pop)}
+.ws-dialog::backdrop{background:rgba(14,11,26,.5)}
+.ws-dialog h2{margin:0;font-family:var(--font-sans);font-size:var(--text-h2);color:var(--afg)}
+.dlg-sub{margin:10px 0 0;color:var(--amut);font-size:var(--text-body-sm)}
+.dlg-field{margin-top:20px}
+.dlg-label{display:block;margin-bottom:9px;font-family:var(--font-mono);font-size:var(--text-label-xs);
+  letter-spacing:var(--tracking-label);text-transform:uppercase;color:var(--adim)}
+.dlg-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
+.amt{display:flex;gap:8px}
+.amt label{position:relative;flex:1}
+.amt input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.amt span{display:flex;align-items:center;justify-content:center;min-height:46px;background:var(--apanel2);
+  border:1px solid var(--aline);font-family:var(--font-mono);font-size:var(--text-body-sm);color:var(--afg)}
+.amt input:checked + span{background:var(--accent);border-color:var(--accent);color:var(--accent-strong)}
+.amt input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.ws-dialog .urow{margin-top:8px}
+.ws-dialog .d-share{margin-top:14px}
+body[data-theme="dark"] .ws-dialog::backdrop{background:rgba(0,0,0,.66)}
